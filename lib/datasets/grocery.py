@@ -10,7 +10,8 @@ import subprocess
 
 class grocery(imdb):
     def __init__(self, image_set, devkit_path):
-        datasets.imdb.__init__(self, 'grocery_'+image_set)
+        print(image_set,devkit_path)
+        imdb.__init__(self, 'grocery_'+image_set)
         self._image_set = image_set
         self._devkit_path = devkit_path
         self._data_path = os.path.join(self._devkit_path, 'data')
