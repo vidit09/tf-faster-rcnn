@@ -5,7 +5,7 @@ import datasets.imdb
 import numpy as np
 import scipy.sparse
 import scipy.io as sio
-import cPickle
+import pickle
 import subprocess
 
 class grocery(datasets.imdb):
@@ -74,14 +74,14 @@ class grocery(datasets.imdb):
         cache_file = os.path.join(self.cache_path, self.name + '_gt_roidb.pkl')
         if os.path.exists(cache_file):
             with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
+                roidb = pickle.load(fid)
             print( '{} gt roidb loaded from {}'.format(self.name, cache_file))
             return roidb
 
         gt_roidb = [self._load_grocery_annotation(index)
                     for index in self.image_index]
         with open(cache_file, 'wb') as fid:
-            cPickle.dump(gt_roidb, fid, cPickle.HIGHEST_PROTOCOL)
+            pickle.dump(gt_roidb, fid, pickle.HIGHEST_PROTOCOL)
         print( 'wrote gt roidb to {}'.format(cache_file))
 
         return gt_roidb
@@ -97,7 +97,7 @@ class grocery(datasets.imdb):
 
         if os.path.exists(cache_file):
             with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
+                roidb = pickle.load(fid)
             print ('{} ss roidb loaded from {}'.format(self.name, cache_file))
             return roidb
 
@@ -110,7 +110,7 @@ class grocery(datasets.imdb):
             print( len(roidb))
 
         with open(cache_file, 'wb') as fid:
-            cPickle.dump(roidb, fid, cPickle.HIGHEST_PROTOCOL)
+            pickle.dump(roidb, fid, pickle.HIGHEST_PROTOCOL)
             print ('wrote ss roidb to {}'.format(cache_file))
 
         return roidb
@@ -128,7 +128,7 @@ class grocery(datasets.imdb):
         assert os.path.exists(filename), \
                'rpn data not found at: {}'.format(filename)
         with open(filename, 'rb') as f:
-            box_list = cPickle.load(f)
+            box_list = pickle.load(f)
         return self.create_roidb_from_box_list(box_list, gt_roidb)
 
     def _load_selective_search_roidb(self, gt_roidb):
@@ -156,7 +156,7 @@ class grocery(datasets.imdb):
 
         if os.path.exists(cache_file):
             with open(cache_file, 'rb') as fid:
-                roidb = cPickle.load(fid)
+                roidb = pickle.load(fid)
             print( '{} ss roidb loaded from {}'.format(self.name, cache_file))
             return roidb
 
@@ -164,7 +164,7 @@ class grocery(datasets.imdb):
         ss_roidb = self._load_selective_search_IJCV_roidb(gt_roidb)
         roidb = datasets.imdb.merge_roidbs(gt_roidb, ss_roidb)
         with open(cache_file, 'wb') as fid:
-            cPickle.dump(roidb, fid, cPickle.HIGHEST_PROTOCOL)
+            pickle.dump(roidb, fid, pickle.HIGHEST_PROTOCOL)
         print( 'wrote ss roidb to {}'.format(cache_file))
 
         return roidb
