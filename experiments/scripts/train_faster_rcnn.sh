@@ -46,6 +46,7 @@ case ${DATASET} in
     ITERS=110000
     ANCHORS="[8,16,32]"
     RATIOS="[0.5,1,2]"
+    ;;
   *)
     echo "No dataset given"
     exit
