@@ -46,7 +46,7 @@ for year in ['2015']:
 # Set own dataset
 path = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery'
 for split in ['train' 'val' 'test']:
-  name = 'grocery_obj_{}'.format(split)
+  name = 'grocery_{}'.format(split)
   __sets[name] = (lambda split=split: grocery(split, path))
 
 
