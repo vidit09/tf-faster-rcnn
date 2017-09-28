@@ -1,14 +1,14 @@
 
 import datasets
 import os
-import datasets.imdb
+from datasets.imdb import imdb
 import numpy as np
 import scipy.sparse
 import scipy.io as sio
 import pickle
 import subprocess
 
-class grocery(datasets.imdb):
+class grocery(imdb):
     def __init__(self, image_set, devkit_path):
         datasets.imdb.__init__(self, image_set)
         self._image_set = image_set
