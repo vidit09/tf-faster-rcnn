@@ -9,6 +9,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import os
+
 
 __sets = {}
 from datasets.pascal_voc import pascal_voc
@@ -42,10 +44,10 @@ for year in ['2015']:
 
 
 # Set own dataset
-path = ''
+path = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery'
 for split in ['train' 'val' 'test']:
   name = 'grocery_obj_{}'.format(split)
-  _sets[name] = (lambda split=split: grocery(split,path))
+  __sets[name] = (lambda split=split: grocery(split, path))
 
 
 def get_imdb(name):
