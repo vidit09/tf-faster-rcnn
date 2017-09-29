@@ -116,6 +116,7 @@ class imdb(object):
       oldx1.astype(int)
       oldx2.astype(int)
       print(widths[i])
+      print(type(oldx2[-1]))
       newx1 = (int(widths[i]) - oldx2 - 1)
       newx2 = (int(widths[i]) - oldx1 - 1)
       print(newx1)
