@@ -121,9 +121,9 @@ class imdb(object):
       newx2[newx2<0] = 0
       boxes[:, 0] = newx1
       boxes[:, 2] = newx2
-      # print(boxes[:, 0])
-      # print('**')
-      # print(boxes[:, 2])
+      print(boxes[:, 0])
+      print('**')
+      print(boxes[:, 2])
       assert (boxes[:, 2] >= boxes[:, 0]).all()
       entry = {'boxes': boxes,
                'gt_overlaps': self.roidb[i]['gt_overlaps'],
