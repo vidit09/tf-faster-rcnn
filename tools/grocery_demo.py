@@ -45,38 +45,39 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
         print('Total Proposed bbox after threshold:{}'.format(len(inds)))
         return
 
-    im = im[:, :, (2, 1, 0)]
-    fig, ax = plt.subplots(figsize=(12, 12))
-    fig.set_visible(False)
-    ax.imshow(im, aspect='equal')
+    # im = im[:, :, (2, 1, 0)]
+    # fig, ax = plt.subplots(figsize=(12, 12))
+    # fig.set_visible(False)
+    # ax.imshow(im, aspect='equal')
     for i in inds:
         bbox = dets[i, :4]
         score = dets[i, -1]
 
-        ax.add_patch(
-            plt.Rectangle((bbox[0], bbox[1]),
-                          bbox[2] - bbox[0],
-                          bbox[3] - bbox[1], fill=False,
-                          edgecolor='red', linewidth=3.5)
-            )
-        ax.text(bbox[0], bbox[1] - 2,
-                '{:s} {:.3f}'.format(class_name, score),
-                bbox=dict(facecolor='blue', alpha=0.5),
-                fontsize=14, color='white')
-
-    ax.set_title(('{} detections with '
-                  'p({} | box) >= {:.1f}').format(class_name, class_name,
-                                                  thresh),
-                  fontsize=14)
-    plt.axis('off')
-    plt.tight_layout()
-    plt.draw()
+        cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,255,0),3)
+    #     ax.add_patch(
+    #         plt.Rectangle((bbox[0], bbox[1]),
+    #                       bbox[2] - bbox[0],
+    #                       bbox[3] - bbox[1], fill=False,
+    #                       edgecolor='red', linewidth=3.5)
+    #         )
+    #     ax.text(bbox[0], bbox[1] - 2,
+    #             '{:s} {:.3f}'.format(class_name, score),
+    #             bbox=dict(facecolor='blue', alpha=0.5),
+    #             fontsize=14, color='white')
+    #
+    # ax.set_title(('{} detections with '
+    #               'p({} | box) >= {:.1f}').format(class_name, class_name,
+    #                                               thresh),
+    #               fontsize=14)
+    # plt.axis('off')
+    # plt.tight_layout()
+    # plt.draw()
 
     path = os.path.dirname(im_path)
     im_name = os.path.basename(im_path)
     out_image = path+im_name.split('.')[0]+'_out.jpg'
     print('Saving output at {}'.format(out_image))
-    plt.savefig(out_image)
+    cv2.imwrite(out_image,im)
 
 def demo(sess, net, image_name):
     """Detect object classes in an image using pre-computed object proposals."""
@@ -159,4 +160,4 @@ if __name__ == '__main__':
         print('Demo for data/demo/{}'.format(im_name))
         demo(sess, net, im_name)
 
-    plt.show()
+    # plt.show()
