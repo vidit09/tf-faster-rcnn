@@ -8,6 +8,7 @@ export PYTHONUNBUFFERED="True"
 GPU_ID=$1
 DATASET=$2
 NET=$3
+ITER=$4
 
 array=( $@ )
 len=${#array[@]}
@@ -43,7 +44,7 @@ case ${DATASET} in
     TRAIN_IMDB="grocery_train"
     TEST_IMDB="grocery_test"
     STEPSIZE="[80000]"
-    ITERS=1100
+    ITERS=${ITER}
     ANCHORS="[8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
