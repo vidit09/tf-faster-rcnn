@@ -108,16 +108,15 @@ class imdb(object):
 
   def append_flipped_images(self):
     num_images = self.num_images
-    widths = np.array(self._get_widths())
-    widths.astype(int)
+    widths = self._get_widths()
     for i in range(num_images):
       boxes = self.roidb[i]['boxes'].copy()
       oldx1 = boxes[:, 0].copy()
       oldx2 = boxes[:, 2].copy()
       oldx1.astype(int)
       oldx2.astype(int)
-      newx1 = (widths[i] - oldx2 - 1)
-      newx2 = (widths[i] - oldx1 - 1)
+      newx1 = (int(widths[i]) - oldx2 - 1)
+      newx2 = (int(widths[i]) - oldx1 - 1)
       newx1[newx1<0] = 0
       newx2[newx2<0] = 0
       boxes[:, 0] = newx1
