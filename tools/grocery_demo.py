@@ -72,7 +72,9 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
 
     path = os.path.dirname(im_path)
     im_name = os.path.basename(im_path)
-    plt.savefig(path+im_name.split('.')[0]+'_out.jpg')
+    out_image = path+im_name.split('.')[0]+'_out.jpg'
+    print('Saving output at {}'.format(out_image))
+    plt.savefig(out_image)
 
 def demo(sess, net, image_name):
     """Detect object classes in an image using pre-computed object proposals."""
