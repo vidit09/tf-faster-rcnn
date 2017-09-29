@@ -35,7 +35,7 @@ CLASSES = ('__background__',
 
 NETS = {'res101': ('res101_faster_rcnn_iter_{}.ckpt',)}
 DATASETS= {'pascal_voc': ('voc_2007_trainval',),'pascal_voc_0712': ('voc_2007_trainval+voc_2012_trainval',),
-           'grocery':'grocery_train'}
+           'grocery':('grocery_train')}
 
 def vis_detections(im, class_name, dets,im_path, thresh=0.5):
     """Draw detected bounding boxes."""
