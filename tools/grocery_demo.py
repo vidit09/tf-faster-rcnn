@@ -75,7 +75,7 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
 
     path = os.path.dirname(im_path)
     im_name = os.path.basename(im_path)
-    out_image = path+im_name.split('.')[0]+'_out.jpg'
+    out_image = path+'/'+im_name.split('.')[0]+'_out.jpg'
     print('Saving output at {}'.format(out_image))
     cv2.imwrite(out_image,im)
 
