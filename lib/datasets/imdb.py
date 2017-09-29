@@ -115,20 +115,15 @@ class imdb(object):
       oldx2 = boxes[:, 2].copy()
       oldx1 = oldx1.astype(int)
       oldx2 = oldx2.astype(int)
-      print(widths[i])
-      print(type(oldx2[-1]))
+
       newx1 = (int(widths[i]) - oldx2 - 1)
       newx2 = (int(widths[i]) - oldx1 - 1)
-      print(newx1)
-      print('**')
-      print(newx2)
+
       newx1[newx1<0] = 0
       newx2[newx2<0] = 0
       boxes[:, 0] = newx1
       boxes[:, 2] = newx2
-      # print(boxes[:, 0])
-      # print('**')
-      # print(boxes[:, 2])
+
       assert (boxes[:, 2] >= boxes[:, 0]).all()
       entry = {'boxes': boxes,
                'gt_overlaps': self.roidb[i]['gt_overlaps'],
