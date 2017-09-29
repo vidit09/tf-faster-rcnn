@@ -115,6 +115,7 @@ class imdb(object):
       oldx2 = boxes[:, 2].copy()
       oldx1.astype(int)
       oldx2.astype(int)
+      print(type(oldx2))
       newx1 = (int(widths[i]) - oldx2 - 1)
       newx2 = (int(widths[i]) - oldx1 - 1)
       newx1[newx1<0] = 0
