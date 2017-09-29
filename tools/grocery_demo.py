@@ -41,6 +41,8 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
     """Draw detected bounding boxes."""
     inds = np.where(dets[:, -1] >= thresh)[0]
     if len(inds) == 0:
+        print('Total Proposed bbox:{}'.format(dets.shape[0]))
+        print('Total Proposed bbox after threshold:{}'.format(len(inds)))
         return
 
     im = im[:, :, (2, 1, 0)]
