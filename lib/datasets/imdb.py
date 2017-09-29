@@ -113,15 +113,15 @@ class imdb(object):
       boxes = self.roidb[i]['boxes'].copy()
       oldx1 = boxes[:, 0].copy()
       oldx2 = boxes[:, 2].copy()
-      print('image{}'.format(i))
-      print(oldx1)
-      print('**')
-      print(oldx2)
-      boxes[:, 0] = widths[i] - oldx2 - 1
-      boxes[:, 2] = widths[i] - oldx1 - 1
-      print(boxes[:, 0])
-      print('**')
-      print(boxes[:, 2])
+      # print('image{}'.format(i))
+      # print(oldx1)
+      # print('**')
+      # print(oldx2)
+      boxes[:, 0] = max(int(widths[i] - oldx2 - 1),0)
+      boxes[:, 2] = max(int(widths[i] - oldx1 - 1),0)
+      # print(boxes[:, 0])
+      # print('**')
+      # print(boxes[:, 2])
       assert (boxes[:, 2] >= boxes[:, 0]).all()
       entry = {'boxes': boxes,
                'gt_overlaps': self.roidb[i]['gt_overlaps'],

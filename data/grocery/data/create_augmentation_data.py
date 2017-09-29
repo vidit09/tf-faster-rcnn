@@ -76,10 +76,10 @@ with open(aug_annotation_file,'w') as aug_anno_f:
 
                 jitter1 = np.random.randint(-10, 10, 1)
                 jitter2 = np.random.randint(-10, 10, 1)
-                x_min = min(max(int(bbox[0])+jitter1, 0), col)
-                y_min = min(max(int(bbox[2])+jitter1, 0), row)
-                x_max = min(max(int(bbox[1])+jitter2, 0), col)
-                y_max = min(max(int(bbox[3])+jitter2, 0), row)
+                x_min = min(max(int(bbox[0])+jitter1, 0), col-1)
+                y_min = min(max(int(bbox[2])+jitter1, 0), row-1)
+                x_max = min(max(int(bbox[1])+jitter2, 0), col-1)
+                y_max = min(max(int(bbox[3])+jitter2, 0), row-1)
 
                 aug_anno_f.write(str(x_min)+' '+str(y_min)+' '+str(x_max)+' '+str(y_max)+'\n')
 

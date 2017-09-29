@@ -18,6 +18,7 @@ with open('./annotations.txt') as f:
 
         else:
             coor = re.findall('\d+',line)
+
             af.write(coor[0]+' '+coor[1]+' '+coor[2]+' '+coor[3]+'\n')
 
 
