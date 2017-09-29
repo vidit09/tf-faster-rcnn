@@ -115,12 +115,12 @@ class imdb(object):
       oldx2 = boxes[:, 2].copy()
       oldx1.astype(int)
       oldx2.astype(int)
-      # print('image{}'.format(i))
-      # print(oldx1)
-      # print('**')
-      # print(oldx2)
-      boxes[:, 0] = max((widths[i] - oldx2 - 1),0)
-      boxes[:, 2] = max((widths[i] - oldx1 - 1),0)
+      newx1 = (widths[i] - oldx2 - 1)
+      newx2 = (widths[i] - oldx1 - 1)
+      newx1[newx1<0] = 0
+      newx2[newx2<0] = 0
+      boxes[:, 0] = newx1
+      boxes[:, 2] = newx2
       # print(boxes[:, 0])
       # print('**')
       # print(boxes[:, 2])
