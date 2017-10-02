@@ -186,8 +186,8 @@ class SolverWrapper(object):
     var_keep_dic = self.get_variables_in_checkpoint_file(self.pretrained_model)
     # Get the variables to restore, ignoring the variables to fix
     variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
-    for v in variables_to_restore:
-      print(v)
+    variables_to_restore = variables_to_restore[:-4] #don't restore last layers
+
     restorer = tf.train.Saver(variables_to_restore)
     restorer.restore(sess, self.pretrained_model)
     print('Loaded.')
