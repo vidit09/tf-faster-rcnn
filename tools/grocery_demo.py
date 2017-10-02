@@ -114,7 +114,7 @@ def parse_args():
     parser.add_argument('--dataset', dest='dataset', help='Trained dataset [pascal_voc pascal_voc_0712]',
                         choices=DATASETS.keys(), default='pascal_voc_0712')
     parser.add_argument('--iters', dest='iters')
-    parser.add_argument('--im', dest='img')
+    parser.add_argument('--img', dest='img')
     args = parser.parse_args()
 
     return args
