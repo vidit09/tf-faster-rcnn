@@ -45,7 +45,7 @@ case ${DATASET} in
     TEST_IMDB="grocery_test"
     STEPSIZE="[80000]"
     ITERS=${ITER}
-    ANCHORS="[8,16,32]"
+    ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
   *)
