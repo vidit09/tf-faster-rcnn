@@ -148,7 +148,7 @@ if __name__ == '__main__':
     else:
         raise NotImplementedError
     net.create_architecture("TEST", 2,
-                          tag='default', anchor_scales=[8, 16, 32])
+                          tag='default', anchor_scales=[4, 8, 16, 32])
     saver = tf.train.Saver()
     saver.restore(sess, tfmodel)
 
