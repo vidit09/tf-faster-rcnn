@@ -187,9 +187,14 @@ class SolverWrapper(object):
     # Get the variables to restore, ignoring the variables to fix
     variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
     variables_to_restore = variables_to_restore[:-4] #don't restore last layers
+    vv = []
     for v in variables_to_restore:
-      print(v)
-    restorer = tf.train.Saver(variables_to_restore)
+      if '/cls_score' not in v.name:
+        if '/bbox_pred' not in v.name:
+          vv.append(v)
+
+    # restorer = tf.train.Saver(variables_to_restore)
+    restorer = tf.train.Saver(vv)
     restorer.restore(sess, self.pretrained_model)
     print('Loaded.')
     # Need to fix the variables before loading, so that the RGB weights are changed to BGR
