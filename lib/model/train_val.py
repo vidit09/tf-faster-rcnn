@@ -187,7 +187,8 @@ class SolverWrapper(object):
     # Get the variables to restore, ignoring the variables to fix
     variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
     variables_to_restore = variables_to_restore[:-4] #don't restore last layers
-
+    for v in variables_to_restore:
+      print(v)
     restorer = tf.train.Saver(variables_to_restore)
     restorer.restore(sess, self.pretrained_model)
     print('Loaded.')
