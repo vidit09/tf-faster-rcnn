@@ -114,6 +114,7 @@ def parse_args():
     parser.add_argument('--dataset', dest='dataset', help='Trained dataset [pascal_voc pascal_voc_0712]',
                         choices=DATASETS.keys(), default='pascal_voc_0712')
     parser.add_argument('--iters', dest='iters')
+    parser.add_argument('--im', dest='img')
     args = parser.parse_args()
 
     return args
@@ -126,6 +127,7 @@ if __name__ == '__main__':
     demonet = args.demo_net
     dataset = args.dataset
     iters = args.iters
+    img = args.img
     tfmodel = os.path.join('output', demonet, DATASETS[dataset][0], 'default',
                               NETS[demonet][0].format(iters))
 
@@ -154,7 +156,8 @@ if __name__ == '__main__':
 
     print('Loaded network {:s}'.format(tfmodel))
 
-    im_names = ['7.jpg']
+    # im_names = ['7.jpg']
+    im_names = [img]
     for im_name in im_names:
         print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
         print('Demo for data/demo/{}'.format(im_name))
