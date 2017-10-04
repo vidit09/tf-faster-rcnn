@@ -1,12 +1,13 @@
 import os
 import re
 
-anno_dir = 'Annotations/'
+parent_dir = './grocery2/data/'
+anno_dir = parent_dir + 'Annotations/'
 
 if not os.path.exists(anno_dir):
     os.mkdir(anno_dir)
 
-with open('./annotations.txt') as f:
+with open(parent_dir+'annotations.txt') as f:
     af = None
 
     for line in f:

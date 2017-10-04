@@ -35,7 +35,7 @@ CLASSES = ('__background__',
 
 NETS = {'res101': ('res101_faster_rcnn_iter_{}.ckpt',)}
 DATASETS= {'pascal_voc': ('voc_2007_trainval',),'pascal_voc_0712': ('voc_2007_trainval+voc_2012_trainval',),
-           'grocery':('grocery_train',)}
+           'grocery':('grocery_train',),'grocery2':('grocery2_train',)}
 
 def vis_detections(im, class_name, dets,im_path, thresh=0.5):
     """Draw detected bounding boxes."""
@@ -53,7 +53,13 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
         bbox = dets[i, :4]
         score = dets[i, -1]
 
-        cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,255,0),3)
+        sub_mat = im[int(bbox[1]):int(bbox[3]),int(bbox[0]):int(bbox[1]),2].copy().astype(int)
+        sub_mat += 200
+        sub_mat = (sub_mat*255/np.max(sub_mat)).astype(np.uint)
+        im[int(bbox[0]):int(bbox[2]), int(bbox[1]):int(bbox[3]), 1] = sub_mat
+        # bbox_pts = np.array([[x, y] for x in [bbox[0], bbox[2]] for y in [bbox[1], bbox[3]]])
+        # cv2.fillPoly(im,bbox_pts,(0,255,0))
+        # cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,255,0),3)
     #     ax.add_patch(
     #         plt.Rectangle((bbox[0], bbox[1]),
     #                       bbox[2] - bbox[0],
@@ -86,6 +92,7 @@ def demo(sess, net, image_name):
     im_file = os.path.join(cfg.DATA_DIR, 'demo', image_name)
     im = cv2.imread(im_file)
 
+    print(im.shape)
     # Detect all object classes and regress object bounds
     timer = Timer()
     timer.tic()

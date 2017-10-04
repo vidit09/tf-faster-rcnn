@@ -2,7 +2,6 @@ import os
 import numpy as np
 import glob
 import cv2
-from matplotlib import pyplot as plt
 
 out_dir = './data/'
 if not os.path.exists(out_dir):
