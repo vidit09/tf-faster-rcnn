@@ -49,7 +49,7 @@ case ${DATASET} in
     RATIOS="[0.5,1,2]"
     ;;
   *)
-   grocery2)
+  grocery2)
     TRAIN_IMDB="grocery2_train"
     TEST_IMDB="grocery2_test"
     STEPSIZE="[80000]"
