@@ -48,7 +48,6 @@ case ${DATASET} in
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
-  *)
   grocery2)
     TRAIN_IMDB="grocery2_train"
     TEST_IMDB="grocery2_test"
