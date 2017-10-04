@@ -55,7 +55,7 @@ datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery2'
 
 for split in ['train', 'val', 'test']:
   name = 'grocery2_{}'.format(split)
-  __sets[name] = (lambda split=split,path=datapath: grocery(split, path))
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='2'))
 
 def get_imdb(name):
   """Get an imdb (image database) by name."""
