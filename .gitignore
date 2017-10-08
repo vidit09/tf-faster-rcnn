@@ -10,3 +10,4 @@ lib/pycocotools/_mask.so
 *.jpg
 lib/model/nms_wrapper.py
 data/grocery2
+data/grocery_bad

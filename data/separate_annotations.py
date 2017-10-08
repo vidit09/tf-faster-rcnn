@@ -1,7 +1,7 @@
 import os
 import re
 
-parent_dir = './grocery2/data/'
+parent_dir = './data2/'
 anno_dir = parent_dir + 'Annotations/'
 
 if not os.path.exists(anno_dir):

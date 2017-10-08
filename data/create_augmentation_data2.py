@@ -6,10 +6,7 @@ import re
 
 import matplotlib.pyplot as plt
 
-
-
-
-out_dir = '../data2/'
+out_dir = 'data2/'
 if not os.path.exists(out_dir):
     os.mkdir(out_dir)
 
@@ -42,17 +39,31 @@ def create_stacks_from_single_image(im, mask):
     mask[mask == 255] = 1
     cv2.multiply(im, mask, im)
 
+    y = np.where(mask == 1)[0]
+    x = np.where(mask == 1)[1]
+
+    x_min = np.min(x)
+    x_max = np.max(x)
+
+    y_min = np.min(y)
+    y_max = np.max(y)
+
     n_im = im.copy()
+    n_mask = mask.copy()
 
     n_row = np.random.randint(1, 3, 1)[0]
     n_col = np.random.randint(1, 5, 1)[0]
 
     for r in range(n_col-1):
         n_im = np.concatenate((n_im, im), axis=1)
+        n_mask = np.concatenate((n_mask, mask), axis=1)
 
     m_im = n_im
+    m_mask = n_mask
+
     for c in range(n_row-1):
         n_im = np.concatenate((n_im, m_im), axis=0)
+        n_mask = np.concatenate((n_mask, m_mask), axis=0)
 
     rects = []
     for r in range(n_row):
@@ -60,20 +71,21 @@ def create_stacks_from_single_image(im, mask):
             y_ = im.shape[0]
             x_ = im.shape[1]
             bbox=[]
-            bbox.append(c*x_)
-            bbox.append(r*y_)
-            bbox.append(c*x_ + x_)
-            bbox.append(r*y_ + y_)
+            bbox.append(x_min+c*x_)
+            bbox.append(y_min+r*y_)
+            bbox.append(x_max+c*x_)
+            bbox.append(y_max+r*y_)
 
             rects.append(bbox)
 
-    return n_im,rects
+    return n_im, n_mask, rects
 
     # for rect in rects:
-        # cv2.rectangle(n_im,(rect[0],rect[1]),(rect[2],rect[3]),(0,255,0),10)
+    #     cv2.rectangle(n_im, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 3)
 
     # print(n_im.shape)
     # plt.imshow(n_im)
+    # plt.imshow(n_mask*255)
     # plt.show()
 
 def transform_bbox(rects,h):
@@ -132,7 +144,7 @@ with open(aug_annotation_file,'w') as aug_anno_f:
 
                 im_fg_mask = cv2.imread(im_dir_path+'/../masks/mask'+re.findall('\d+\.png',_im_name)[0],0)
 
-                im_fg, rects = create_stacks_from_single_image(_im_fg, im_fg_mask)
+                im_fg, mask_fg, rects = create_stacks_from_single_image(_im_fg, im_fg_mask)
 
                 row_fg, col_fg, _ = im_fg.shape
 
@@ -140,13 +152,17 @@ with open(aug_annotation_file,'w') as aug_anno_f:
 
                 h, status = cv2.findHomography(src, dst)
                 im_out = cv2.warpPerspective(im_fg, h, (im_bg.shape[1], im_bg.shape[0]))
+                mask_fg_out = cv2.warpPerspective(mask_fg, h, (im_bg.shape[1], im_bg.shape[0]))
+
 
                 n_rects = transform_bbox(rects,h)
 
-                alpha = np.zeros((row, col), dtype='uint8')
-                alpha[int(bbox[2]):int(bbox[3]), int(bbox[0]):int(bbox[1])] = 1
+                # alpha = np.zeros((row, col), dtype='uint8')
+                # alpha[int(bbox[2]):int(bbox[3]), int(bbox[0]):int(bbox[1])] = 1
+                #
+                # alpha = np.dstack([alpha.T]*3).swapaxes(0, 1).reshape(row, col, 3)
 
-                alpha = np.dstack([alpha.T]*3).swapaxes(0, 1).reshape(row, col, 3)
+                alpha = mask_fg_out
 
                 temp = cv2.multiply(1-alpha, im)
                 im = cv2.add(temp, im_out)
@@ -162,7 +178,7 @@ with open(aug_annotation_file,'w') as aug_anno_f:
 
                     aug_anno_f.write(str(x_min)+' '+str(y_min)+' '+str(x_max)+' '+str(y_max)+'\n')
 
-                # cv2.rectangle(im, (x_min, y_min), (x_max, y_max), (0,255,0),3)
+                #     cv2.rectangle(im, (x_min, y_min), (x_max, y_max), (0, 255, 0), 3)
                 # plt.imshow(im)
 
             cv2.imwrite(out_img_dir+im_name, im)

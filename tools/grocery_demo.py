@@ -53,13 +53,13 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
         bbox = dets[i, :4]
         score = dets[i, -1]
 
-        sub_mat = im[int(bbox[1]):int(bbox[3]),int(bbox[0]):int(bbox[1]),2].copy().astype(int)
+        sub_mat = im[int(bbox[1]):int(bbox[3]),int(bbox[0]):int(bbox[2]),2].copy().astype(int)
         sub_mat += 200
         sub_mat = (sub_mat*255/np.max(sub_mat)).astype(np.uint)
-        im[int(bbox[0]):int(bbox[2]), int(bbox[1]):int(bbox[3]), 1] = sub_mat
+        im[int(bbox[1]):int(bbox[3]), int(bbox[0]):int(bbox[2]), 1] = sub_mat
         # bbox_pts = np.array([[x, y] for x in [bbox[0], bbox[2]] for y in [bbox[1], bbox[3]]])
         # cv2.fillPoly(im,bbox_pts,(0,255,0))
-        # cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,255,0),3)
+        cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,0,0),3)
     #     ax.add_patch(
     #         plt.Rectangle((bbox[0], bbox[1]),
     #                       bbox[2] - bbox[0],
@@ -101,7 +101,7 @@ def demo(sess, net, image_name):
     print('Detection took {:.3f}s for {:d} object proposals'.format(timer.total_time, boxes.shape[0]))
 
     # Visualize detections for each class
-    CONF_THRESH = 0.2
+    CONF_THRESH = 0.0
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(CLASSES[1:]):
         cls_ind += 1 # because we skipped background
