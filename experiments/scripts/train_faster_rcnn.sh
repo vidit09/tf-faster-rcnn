@@ -51,7 +51,7 @@ case ${DATASET} in
   grocery2)
     TRAIN_IMDB="grocery2_train"
     TEST_IMDB="grocery2_test"
-    STEPSIZE="[80000]"
+    STEPSIZE="[3000]"
     ITERS=${ITER}
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
