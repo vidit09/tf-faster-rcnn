@@ -121,6 +121,9 @@ class SolverWrapper(object):
       layers = self.net.create_architecture('TRAIN', self.imdb.num_classes, tag='default',
                                             anchor_scales=cfg.ANCHOR_SCALES,
                                             anchor_ratios=cfg.ANCHOR_RATIOS)
+      keys = layers.keys()
+      for key in keys:
+        print(key)
       # Define the loss
       loss = layers['total_loss']
       # Set learning rate and momentum
