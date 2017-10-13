@@ -126,10 +126,11 @@ class SolverWrapper(object):
         print(key)
       # Define the loss
       loss = layers['total_loss']
+      print("Learning rate:{}".format(cfg.TRAIN.LEARNING_RATE))
       # Set learning rate and momentum
       lr = tf.Variable(cfg.TRAIN.LEARNING_RATE, trainable=False)
       self.optimizer = tf.train.MomentumOptimizer(lr, cfg.TRAIN.MOMENTUM)
-
+     # print("lr at init:{}".format(lr.eval()))
       # Compute the gradients with regard to the loss
       gvs = self.optimizer.compute_gradients(loss)
       # Double the gradient of the bias if set
@@ -210,7 +211,7 @@ class SolverWrapper(object):
     last_snapshot_iter = 0
     rate = cfg.TRAIN.LEARNING_RATE
     stepsizes = list(cfg.TRAIN.STEPSIZE)
-
+    print("lr in initialize:{}".format(rate))
     return rate, last_snapshot_iter, stepsizes, np_paths, ss_paths
 
   def restore(self, sess, sfile, nfile):
@@ -227,7 +228,7 @@ class SolverWrapper(object):
         rate *= cfg.TRAIN.GAMMA
       else:
         stepsizes.append(stepsize)
-
+    #print("Restored LR:{}".format(rate))
     return rate, last_snapshot_iter, stepsizes, np_paths, ss_paths
 
   def remove_snapshot(self, np_paths, ss_paths):
@@ -258,13 +259,14 @@ class SolverWrapper(object):
 
     # Construct the computation graph
     lr, train_op = self.construct_graph(sess)
-
+   
     # Find previous snapshots if there is any to restore from
     lsf, nfiles, sfiles = self.find_previous()
 
     # Initialize the variables or restore them from the last snapshot
     if lsf == 0:
       rate, last_snapshot_iter, stepsizes, np_paths, ss_paths = self.initialize(sess)
+      sess.run(tf.assign(lr, rate))
     else:
       rate, last_snapshot_iter, stepsizes, np_paths, ss_paths = self.restore(sess, 
                                                                             str(sfiles[-1]), 
@@ -277,6 +279,7 @@ class SolverWrapper(object):
     stepsizes.reverse()
     next_stepsize = stepsizes.pop()
     while iter < max_iters + 1:
+#      print("Learning rate each iteration{}".format(lr.eval()))
       # Learning rate
       if iter == next_stepsize + 1:
         # Add snapshot here before reducing the learning rate

@@ -33,8 +33,8 @@ case ${DATASET} in
     RATIOS="[0.5,1,2]"
     ;;
   coco)
-    TRAIN_IMDB="coco_2014_train+coco_2014_valminusminival"
-    TEST_IMDB="coco_2014_minival"
+    TRAIN_IMDB="coco_2014_train+coco_2014_val"
+    TEST_IMDB="coco_2014_val"
     STEPSIZE="[350000]"
     ITERS=490000
     ANCHORS="[4,8,16,32]"
@@ -52,6 +52,14 @@ case ${DATASET} in
     TRAIN_IMDB="grocery2_train"
     TEST_IMDB="grocery2_test"
     STEPSIZE="[3000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery3)
+    TRAIN_IMDB="grocery3_train"
+    TEST_IMDB="grocery3_test"
+    STEPSIZE="[10000]"
     ITERS=${ITER}
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
