@@ -177,6 +177,7 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, thresh=0.05):
         image_thresh = np.sort(image_scores)[-max_per_image]
         for j in range(1, imdb.num_classes):
           keep = np.where(all_boxes[j][i][:, -1] >= image_thresh)[0]
+          print('len of keep:{}'.format(len(keep)))
           all_boxes[j][i] = all_boxes[j][i][keep, :]
     _t['misc'].toc()
 

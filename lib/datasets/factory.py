@@ -64,6 +64,34 @@ for split in ['train', 'val', 'test']:
   name = 'grocery3_{}'.format(split)
   __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='3'))
 
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery4'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery4_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='4'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery5'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery5_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='5'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery6'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery6_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='6'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery7'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery7_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='7'))
+
 def get_imdb(name):
   """Get an imdb (image database) by name."""
   if name not in __sets:

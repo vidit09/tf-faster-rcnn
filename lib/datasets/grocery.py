@@ -7,6 +7,8 @@ import scipy.sparse
 import scipy.io as sio
 import pickle
 import subprocess
+from .grocery_eval import grocery_eval
+import errno
 
 class grocery(imdb):
     def __init__(self, image_set, devkit_path,db=''):
@@ -22,7 +24,8 @@ class grocery(imdb):
         self._image_index = self._load_image_set_index()
         # Default to roidb handler
         self._roidb_handler = self.gt_roidb
-
+        self._comp_id = 'comp4'
+        self._salt = 'salt'
         # Specific config options
         self.config = {'cleanup'  : True,
                        'use_salt' : True,
@@ -224,19 +227,13 @@ class grocery(imdb):
                 'gt_overlaps' : overlaps,
                 'flipped' : False}
 
-    def _write_grocery_results_file(self, all_boxes):
-        use_salt = self.config['use_salt']
-        comp_id = 'comp4'
-        if use_salt:
-            comp_id += '-{}'.format(os.getpid())
 
-        # VOCdevkit/results/comp4-44503_det_test_aeroplane.txt
-        path = os.path.join(self._devkit_path, 'results', self.name, comp_id + '_')
+    def _write_grocery_results_file(self, all_boxes):
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
                 continue
-            print('Writing {} results file'.format(cls))
-            filename = path + 'det_' + self._image_set + '_' + cls + '.txt'
+            print( 'Writing {} results file'.format(cls))
+            filename = self._get_grocery_results_file_template().format(cls)
             with open(filename, 'wt') as f:
                 for im_ind, index in enumerate(self.image_index):
                     dets = all_boxes[cls_ind][im_ind]
@@ -248,33 +245,80 @@ class grocery(imdb):
                                 format(index, dets[k, -1],
                                        dets[k, 0] + 1, dets[k, 1] + 1,
                                        dets[k, 2] + 1, dets[k, 3] + 1))
-        return comp_id
 
-    def _do_matlab_eval(self, comp_id, output_dir='output'):
-        rm_results = self.config['cleanup']
-
-        path = os.path.join(os.path.dirname(__file__),
-                            'VOCdevkit-matlab-wrapper')
-        cmd = 'cd {} && '.format(path)
-        cmd += '{:s} -nodisplay -nodesktop '.format(datasets.MATLAB)
-        cmd += '-r "dbstop if error; '
-        cmd += 'setenv(\'LC_ALL\',\'C\'); voc_eval(\'{:s}\',\'{:s}\',\'{:s}\',\'{:s}\',{:d}); quit;"' \
-               .format(self._devkit_path, comp_id,
-                       self._image_set, output_dir, int(rm_results))
-        print('Running:\n{}'.format(cmd))
-        status = subprocess.call(cmd, shell=True)
 
     def evaluate_detections(self, all_boxes, output_dir):
-        comp_id = self._write_grocery_results_file(all_boxes)
-        self._do_matlab_eval(comp_id, output_dir)
+        self._write_grocery_results_file(all_boxes)
+        self._do_python_eval(output_dir)
+        if self.config['cleanup']:
+            for cls in self._classes:
+                if cls == '__background__':
+                    continue
+                filename = self._get_grocery_results_file_template().format(cls)
+                os.remove(filename)
 
-    def competition_mode(self, on):
-        if on:
-            self.config['use_salt'] = False
-            self.config['cleanup'] = False
-        else:
-            self.config['use_salt'] = True
-            self.config['cleanup'] = True
+
+    def _get_comp_id(self):
+        comp_id = (self._comp_id + '_' + self._salt if self.config['use_salt']
+            else self._comp_id)
+        return comp_id
+
+
+    def _get_grocery_results_file_template(self):
+        # INRIAdevkit/results/comp4-44503_det_test_{%s}.txt
+        filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
+        try:
+            os.mkdir(self._devkit_path + '/results')
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                pass
+            else:
+                raise e
+        path = os.path.join(
+            self._devkit_path,
+            'results',
+            filename)
+        return path
+
+
+    def _do_python_eval(self, output_dir = 'output'):
+        annopath = os.path.join(
+            self._data_path,
+            'Annotations',
+            '{:s}.txt')
+        imagesetfile = os.path.join(
+            self._data_path,
+            'ImageSets',
+            self._image_set + '.txt')
+        cachedir = os.path.join(self._devkit_path, 'annotations_cache')
+        aps = []
+        if not os.path.isdir(output_dir):
+            os.mkdir(output_dir)
+        for i, cls in enumerate(self._classes):
+            if cls == '__background__':
+                continue
+            filename = self._get_grocery_results_file_template().format(cls)
+            rec, prec, ap = grocery_eval(
+                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.01)
+            aps += [ap]
+            print('AP for {} = {:.4f}'.format(cls, ap))
+            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
+                diction = {'rec': rec, 'prec': prec, 'ap': ap}
+                pickle.dump(diction, f)
+        print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        print('~~~~~~~~')
+        print('Results:')
+        for ap in aps:
+            print('{:.3f}'.format(ap))
+        print('{:.3f}'.format(np.mean(aps)))
+        print('~~~~~~~~')
+        print('')
+        print('--------------------------------------------------------------')
+        print('Results computed with the **unofficial** Python eval code.')
+        print('Results should be very close to the official MATLAB eval code.')
+        print('Recompute with `./tools/reval.py --matlab ...` for your paper.')
+        print('-- Thanks, The Management')
+        print('--------------------------------------------------------------')
 
 if __name__ == '__main__':
     d = datasets.grocery('train', '')
