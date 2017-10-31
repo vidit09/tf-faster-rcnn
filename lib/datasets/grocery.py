@@ -299,7 +299,7 @@ class grocery(imdb):
                 continue
             filename = self._get_grocery_results_file_template().format(cls)
             rec, prec, ap = grocery_eval(
-                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.01)
+                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:

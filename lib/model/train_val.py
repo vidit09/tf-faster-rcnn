@@ -131,8 +131,13 @@ class SolverWrapper(object):
       lr = tf.Variable(cfg.TRAIN.LEARNING_RATE, trainable=False)
       self.optimizer = tf.train.MomentumOptimizer(lr, cfg.TRAIN.MOMENTUM)
      # print("lr at init:{}".format(lr.eval()))
+      var_train = []
+      for var in tf.trainable_variables():
+        if any(prefix in var.name for prefix in ['rpn','cls','bbox']):
+          var_train.append(var)
+          print("gradient only for var:{}".format(var.name))
       # Compute the gradients with regard to the loss
-      gvs = self.optimizer.compute_gradients(loss)
+      gvs = self.optimizer.compute_gradients(loss,var_train)
       # Double the gradient of the bias if set
       if cfg.TRAIN.DOUBLE_BIAS:
         final_gvs = []
