@@ -1,3 +1,4 @@
+
 import datasets
 import os
 from datasets.imdb import imdb
@@ -246,44 +247,16 @@ class grocery(imdb):
                                        dets[k, 0] + 1, dets[k, 1] + 1,
                                        dets[k, 2] + 1, dets[k, 3] + 1))
 
-    def _write_grocery_results_file_per_image(self, all_boxes):
 
-        for im_ind, index in enumerate(self.image_index):
-            print( 'Writing {} results file'.format(index))
-            filename = self._get_grocery_results_file_template().format(index) 
-            
-            with open(filename, 'wt') as f:
-                for cls_ind, cls in enumerate(self.classes):
-                    if cls == '__background__':
-                        continue
-
-                    dets = all_boxes[cls_ind][im_ind]
-                    if dets == []:
-                        continue
-                    # the VOCdevkit expects 1-based indices
-                    for k in range(dets.shape[0]):
-                        f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
-                                format(cls, dets[k, -1],
-                                       dets[k, 0] + 1, dets[k, 1] + 1,
-                                       dets[k, 2] + 1, dets[k, 3] + 1))
-
-    def evaluate_detections(self, all_boxes, output_dir, eccv14=0):
-        if not eccv14:
-            self._write_grocery_results_file(all_boxes)
-            self._do_python_eval(output_dir)
-            if self.config['cleanup']:
-                for cls in self._classes:
-                    if cls == '__background__':
-                        continue
-                    filename = self._get_grocery_results_file_template().format(cls)
-                    os.remove(filename)
-        else:
-            self._write_grocery_results_file_per_image(all_boxes)
-            self._do_python_eval(output_dir,eccv14)
-            if self.config['cleanup']:
-                for cls in self.image_index:
-                    filename = self._get_grocery_results_file_template().format(cls)
-                    os.remove(filename)
+    def evaluate_detections(self, all_boxes, output_dir):
+        self._write_grocery_results_file(all_boxes)
+        self._do_python_eval(output_dir)
+        if self.config['cleanup']:
+            for cls in self._classes:
+                if cls == '__background__':
+                    continue
+                filename = self._get_grocery_results_file_template().format(cls)
+                os.remove(filename)
 
 
     def _get_comp_id(self):
@@ -309,7 +282,7 @@ class grocery(imdb):
         return path
 
 
-    def _do_python_eval(self, output_dir = 'output', eccv14=0):
+    def _do_python_eval(self, output_dir = 'output'):
         annopath = os.path.join(
             self._data_path,
             'Annotations',
@@ -322,30 +295,17 @@ class grocery(imdb):
         aps = []
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
-
-        if not eccv14:
-            cat = self.classes
-        else:
-            cat = self.image_index
-
-        for i, cls in enumerate(cat):
+        for i, cls in enumerate(self._classes):
             if cls == '__background__':
                 continue
             filename = self._get_grocery_results_file_template().format(cls)
-            
-            if not eccv14:
-                rec, prec, ap = grocery_eval(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
-            else:
-                rec, prec, ap = grocery_eval_eccv_14(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
-
+            rec, prec, ap = grocery_eval_eccv_14(
+                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
                 diction = {'rec': rec, 'prec': prec, 'ap': ap}
                 pickle.dump(diction, f)
-
         print('Mean AP = {:.4f}'.format(np.mean(aps)))
         print('~~~~~~~~')
         print('Results:')

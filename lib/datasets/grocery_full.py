@@ -6,19 +6,19 @@ import scipy.sparse
 import scipy.io as sio
 import pickle
 import subprocess
-from .grocery_eval import grocery_eval
-from .grocery_eval import grocery_eval_eccv_14
+from .grocery_eval import grocery_eval, grocery_eval_eccv_14
 import errno
 
-class grocery(imdb):
+class grocery_full(imdb):
     def __init__(self, image_set, devkit_path,db=''):
         print(image_set,devkit_path)
-        imdb.__init__(self, 'grocery'+db+'_'+image_set)
+        imdb.__init__(self, 'grocery_full'+db+'_'+image_set)
         self._image_set = image_set
         self._devkit_path = devkit_path
         self._data_path = os.path.join(self._devkit_path, 'data')
-        self._classes = ('__background__', # always index 0
-                         'object')
+#        self._classes = ('__background__', # always index 0
+#                         'object')
+        self._classes = self.set_classes() 
         self._class_to_ind = dict(zip(self.classes, range(self.num_classes)))
         self._image_ext = ['.jpg', '.png']
         self._image_index = self._load_image_set_index()
@@ -37,6 +37,12 @@ class grocery(imdb):
                 'Devkit path does not exist: {}'.format(self._devkit_path)
         assert os.path.exists(self._data_path), \
                 'Path does not exist: {}'.format(self._data_path)
+
+    def set_classes(self):
+        bkg = tuple(['__background__'])
+        cls = ['object_'+str(i+1) for i in range(27)] #hardcoded for now
+        cls = bkg+tuple(cls)
+        return cls
 
     def image_path_at(self, i):
         """
@@ -188,7 +194,7 @@ class grocery(imdb):
             box_list.append((raw_data['boxes'][:top_k, :]-1).astype(np.uint16))
 
         return self.create_roidb_from_box_list(box_list, gt_roidb)
-
+   
     def _load_grocery_annotation(self, index):
         """
         Load image and bounding boxes info from txt files of grocery.
@@ -199,10 +205,10 @@ class grocery(imdb):
             data = f.read()
 
         import re
-        objs = re.findall('\d+ \d+ \d+ \d+', data)
+        objs = re.findall('\d+ \d+ \d+ \d+ \d+', data)
 
         num_objs = len(objs)
-
+        #print('Num objs{}'.format(num_objs))
         boxes = np.zeros((num_objs, 4), dtype=np.uint16)
         gt_classes = np.zeros((num_objs), dtype=np.int32)
         overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
@@ -215,7 +221,9 @@ class grocery(imdb):
             y1 = float(coor[1])
             x2 = float(coor[2])
             y2 = float(coor[3])
-            cls = self._class_to_ind['object']
+
+            #print('labels:{}'.format(coor))
+            cls = self._class_to_ind['object_'+coor[4]]
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
             overlaps[ix, cls] = 1.0
@@ -226,7 +234,6 @@ class grocery(imdb):
                 'gt_classes': gt_classes,
                 'gt_overlaps' : overlaps,
                 'flipped' : False}
-
 
     def _write_grocery_results_file(self, all_boxes):
         for cls_ind, cls in enumerate(self.classes):
@@ -249,7 +256,7 @@ class grocery(imdb):
     def _write_grocery_results_file_per_image(self, all_boxes):
 
         for im_ind, index in enumerate(self.image_index):
-            print( 'Writing {} results file'.format(index))
+            print( 'Writing {} results file'.format(im_ind))
             filename = self._get_grocery_results_file_template().format(index) 
             
             with open(filename, 'wt') as f:

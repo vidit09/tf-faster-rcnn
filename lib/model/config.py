@@ -54,7 +54,7 @@ __C.TRAIN.USE_GT = False
 __C.TRAIN.ASPECT_GROUPING = False
 
 # The number of snapshots kept, older ones are deleted to save space
-__C.TRAIN.SNAPSHOT_KEPT = 3
+__C.TRAIN.SNAPSHOT_KEPT = 20
 
 # The time interval for saving tensorflow summaries
 __C.TRAIN.SUMMARY_INTERVAL = 180
@@ -174,14 +174,14 @@ __C.TEST.MAX_SIZE = 1000
 
 # Overlap threshold used for non-maximum suppression (suppress boxes with
 # IoU >= this threshold)
-__C.TEST.NMS = 0.3
+__C.TEST.NMS = 0.5
 
 # Experimental: treat the (K+1) units in the cls_score layer as linear
 # predictors (trained, eg, with one-vs-rest SVMs).
 __C.TEST.SVM = False
 
 # Test using bounding-box regressors
-__C.TEST.BBOX_REG = False
+__C.TEST.BBOX_REG = True
 
 # Propose boxes
 __C.TEST.HAS_RPN = False

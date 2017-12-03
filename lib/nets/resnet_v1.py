@@ -47,6 +47,7 @@ class resnetv1(Network):
   def __init__(self, num_layers=50):
     Network.__init__(self)
     self._feat_stride = [16, ]
+    #self._feat_stride = [8, ]
     self._feat_compress = [1. / float(self._feat_stride[0]), ]
     self._num_layers = num_layers
     self._scope = 'resnet_v1_%d' % num_layers
@@ -156,9 +157,9 @@ class resnetv1(Network):
 
     for v in variables:
       # exclude the first conv layer to swap RGB to BGR
-      if v.name == (self._scope + '/conv1/weights:0'):
-        self._variables_to_fix[v.name] = v
-        continue
+      #if v.name == (self._scope + '/conv1/weights:0'):
+      #  self._variables_to_fix[v.name] = v
+      #  continue
       if v.name.split(':')[0] in var_keep_dic:
         print('Variables restored: %s' % v.name)
         variables_to_restore.append(v)

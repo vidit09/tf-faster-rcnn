@@ -9,10 +9,10 @@ GPU_ID=$1
 DATASET=$2
 NET=$3
 ITER=$4
-
+ECCV=$5
 array=( $@ )
 len=${#array[@]}
-EXTRA_ARGS=${array[@]:4:$len}
+EXTRA_ARGS=${array[@]:5:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 case ${DATASET} in
@@ -97,7 +97,52 @@ case ${DATASET} in
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
-  *)
+  grocery_full)
+    TRAIN_IMDB="grocery_full_train"
+    TEST_IMDB="grocery_full_test"
+   # STEPSIZE="[20000,40000]"
+    STEPSIZE="[25000,40000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery8)
+    TRAIN_IMDB="grocery8_train"
+    TEST_IMDB="grocery8_test"
+    #STEPSIZE="[10000,20000,30000,40000]"
+    STEPSIZE="[15000,30000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery9)
+    TRAIN_IMDB="grocery9_train"
+    TEST_IMDB="grocery9_test"
+    #STEPSIZE="[10000,20000,30000,40000]"
+    STEPSIZE="[15000,30000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery10)
+    TRAIN_IMDB="grocery10_train"
+    TEST_IMDB="grocery10_test"
+    #STEPSIZE="[10000,20000,30000,40000]"
+    STEPSIZE="[8000,18000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery11)
+    TRAIN_IMDB="grocery11_train"
+    TEST_IMDB="grocery11_test"
+    #STEPSIZE="[10000,20000,30000,40000]"
+    STEPSIZE="[10000,20000]"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  *) 
     echo "No dataset given"
     exit
     ;;
@@ -129,7 +174,7 @@ if [ ! -f ${NET_FINAL}.index ]; then
       TRAIN.STEPSIZE ${STEPSIZE} ${EXTRA_ARGS}
   else
     CUDA_VISIBLE_DEVICES=${GPU_ID} python ./tools/trainval_net.py \
-      --weight output/res101/coco_2014_train+coco_2014_valminusminival/res101_faster_rcnn_iter_1190000.ckpt \
+      --weight output/res101/coco_2014_train+coco_2014_valminusminival/default/res101_faster_rcnn_iter_1190000.ckpt \
       --imdb ${TRAIN_IMDB} \
       --imdbval ${TEST_IMDB} \
       --iters ${ITERS} \

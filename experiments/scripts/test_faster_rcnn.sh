@@ -9,10 +9,11 @@ GPU_ID=$1
 DATASET=$2
 NET=$3
 ITER=$4
+ECCV14=$5
 
 array=( $@ )
 len=${#array[@]}
-EXTRA_ARGS=${array[@]:4:$len}
+EXTRA_ARGS=${array[@]:5:$len}
 EXTRA_ARGS_SLUG=${EXTRA_ARGS// /_}
 
 case ${DATASET} in
@@ -33,7 +34,7 @@ case ${DATASET} in
   coco)
     TRAIN_IMDB="coco_2014_train+coco_2014_valminusminival"
     TEST_IMDB="coco_2014_minival"
-    ITERS=490000
+    ITERS=1190000
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
     ;;
@@ -47,6 +48,41 @@ case ${DATASET} in
   grocery5)
     TRAIN_IMDB="grocery5_train"
     TEST_IMDB="grocery5_test"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery_full)
+    TRAIN_IMDB="grocery_full_train"
+    TEST_IMDB="grocery_full_test"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery8)
+    TRAIN_IMDB="grocery8_train"
+    TEST_IMDB="grocery8_test"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery9)
+    TRAIN_IMDB="grocery9_train"
+    TEST_IMDB="grocery9_test"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery10)
+    TRAIN_IMDB="grocery10_train"
+    TEST_IMDB="grocery10_test"
+    ITERS=${ITER}
+    ANCHORS="[4,8,16,32]"
+    RATIOS="[0.5,1,2]"
+    ;;
+  grocery11)
+    TRAIN_IMDB="grocery11_train"
+    TEST_IMDB="grocery11_test"
     ITERS=${ITER}
     ANCHORS="[4,8,16,32]"
     RATIOS="[0.5,1,2]"
@@ -84,6 +120,7 @@ else
     --model ${NET_FINAL} \
     --cfg experiments/cfgs/${NET}.yml \
     --net ${NET} \
+    --eccv14 ${ECCV14} \
     --set ANCHOR_SCALES ${ANCHORS} ANCHOR_RATIOS ${RATIOS} \
           ${EXTRA_ARGS}
 fi

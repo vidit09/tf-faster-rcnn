@@ -1,3 +1,4 @@
+
 import datasets
 import os
 from datasets.imdb import imdb
@@ -7,18 +8,18 @@ import scipy.io as sio
 import pickle
 import subprocess
 from .grocery_eval import grocery_eval
-from .grocery_eval import grocery_eval_eccv_14
 import errno
 
-class grocery(imdb):
+class grocery_full(imdb):
     def __init__(self, image_set, devkit_path,db=''):
         print(image_set,devkit_path)
-        imdb.__init__(self, 'grocery'+db+'_'+image_set)
+        imdb.__init__(self, 'grocery_full'+db+'_'+image_set)
         self._image_set = image_set
         self._devkit_path = devkit_path
         self._data_path = os.path.join(self._devkit_path, 'data')
-        self._classes = ('__background__', # always index 0
-                         'object')
+        #self._classes = ('__background__', # always index 0
+        #                 'object')
+        self._classes = self.set_classes()
         self._class_to_ind = dict(zip(self.classes, range(self.num_classes)))
         self._image_ext = ['.jpg', '.png']
         self._image_index = self._load_image_set_index()
@@ -37,6 +38,12 @@ class grocery(imdb):
                 'Devkit path does not exist: {}'.format(self._devkit_path)
         assert os.path.exists(self._data_path), \
                 'Path does not exist: {}'.format(self._data_path)
+    def set_classes(self):
+        bkg = tuple(['__background__'])
+        cls = ['object_'+str(i+1) for i in range(27)] #hardcoded for now
+        cls = bkg+tuple(cls)
+        return cls
+            
 
     def image_path_at(self, i):
         """
@@ -199,10 +206,10 @@ class grocery(imdb):
             data = f.read()
 
         import re
-        objs = re.findall('\d+ \d+ \d+ \d+', data)
+        objs = re.findall('\d+ \d+ \d+ \d+ \d+', data)
 
         num_objs = len(objs)
-
+        #print('Num objs{}'.format(num_objs))
         boxes = np.zeros((num_objs, 4), dtype=np.uint16)
         gt_classes = np.zeros((num_objs), dtype=np.int32)
         overlaps = np.zeros((num_objs, self.num_classes), dtype=np.float32)
@@ -215,7 +222,9 @@ class grocery(imdb):
             y1 = float(coor[1])
             x2 = float(coor[2])
             y2 = float(coor[3])
-            cls = self._class_to_ind['object']
+            
+            #print('labels:{}'.format(coor))
+            cls = self._class_to_ind['object_'+coor[4]]
             boxes[ix, :] = [x1, y1, x2, y2]
             gt_classes[ix] = cls
             overlaps[ix, cls] = 1.0
@@ -246,44 +255,16 @@ class grocery(imdb):
                                        dets[k, 0] + 1, dets[k, 1] + 1,
                                        dets[k, 2] + 1, dets[k, 3] + 1))
 
-    def _write_grocery_results_file_per_image(self, all_boxes):
 
-        for im_ind, index in enumerate(self.image_index):
-            print( 'Writing {} results file'.format(index))
-            filename = self._get_grocery_results_file_template().format(index) 
-            
-            with open(filename, 'wt') as f:
-                for cls_ind, cls in enumerate(self.classes):
-                    if cls == '__background__':
-                        continue
-
-                    dets = all_boxes[cls_ind][im_ind]
-                    if dets == []:
-                        continue
-                    # the VOCdevkit expects 1-based indices
-                    for k in range(dets.shape[0]):
-                        f.write('{:s} {:.3f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
-                                format(cls, dets[k, -1],
-                                       dets[k, 0] + 1, dets[k, 1] + 1,
-                                       dets[k, 2] + 1, dets[k, 3] + 1))
-
-    def evaluate_detections(self, all_boxes, output_dir, eccv14=0):
-        if not eccv14:
-            self._write_grocery_results_file(all_boxes)
-            self._do_python_eval(output_dir)
-            if self.config['cleanup']:
-                for cls in self._classes:
-                    if cls == '__background__':
-                        continue
-                    filename = self._get_grocery_results_file_template().format(cls)
-                    os.remove(filename)
-        else:
-            self._write_grocery_results_file_per_image(all_boxes)
-            self._do_python_eval(output_dir,eccv14)
-            if self.config['cleanup']:
-                for cls in self.image_index:
-                    filename = self._get_grocery_results_file_template().format(cls)
-                    os.remove(filename)
+    def evaluate_detections(self, all_boxes, output_dir):
+        self._write_grocery_results_file(all_boxes)
+        self._do_python_eval(output_dir)
+        if self.config['cleanup']:
+            for cls in self._classes:
+                if cls == '__background__':
+                    continue
+                filename = self._get_grocery_results_file_template().format(cls)
+                os.remove(filename)
 
 
     def _get_comp_id(self):
@@ -309,7 +290,7 @@ class grocery(imdb):
         return path
 
 
-    def _do_python_eval(self, output_dir = 'output', eccv14=0):
+    def _do_python_eval(self, output_dir = 'output'):
         annopath = os.path.join(
             self._data_path,
             'Annotations',
@@ -322,30 +303,17 @@ class grocery(imdb):
         aps = []
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
-
-        if not eccv14:
-            cat = self.classes
-        else:
-            cat = self.image_index
-
-        for i, cls in enumerate(cat):
+        for i, cls in enumerate(self._classes):
             if cls == '__background__':
                 continue
             filename = self._get_grocery_results_file_template().format(cls)
-            
-            if not eccv14:
-                rec, prec, ap = grocery_eval(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
-            else:
-                rec, prec, ap = grocery_eval_eccv_14(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
-
+            rec, prec, ap = grocery_eval(
+                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5, full=1)
             aps += [ap]
             print('AP for {} = {:.4f}'.format(cls, ap))
             with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
                 diction = {'rec': rec, 'prec': prec, 'ap': ap}
                 pickle.dump(diction, f)
-
         print('Mean AP = {:.4f}'.format(np.mean(aps)))
         print('~~~~~~~~')
         print('Results:')

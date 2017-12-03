@@ -16,7 +16,7 @@ __sets = {}
 from datasets.pascal_voc import pascal_voc
 from datasets.coco import coco
 from datasets.grocery import grocery
-
+from datasets.grocery_full import grocery_full
 import numpy as np
 
 # Set up voc_<year>_<split> 
@@ -91,6 +91,42 @@ datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery7'
 for split in ['train', 'val', 'test']:
   name = 'grocery7_{}'.format(split)
   __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='7'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery_full'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery_full_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery_full(split, path))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery8'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery8_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='8'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery9'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery9_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='9'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery10'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery10_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='10'))
+
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery11'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery11_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='11'))
+
 
 def get_imdb(name):
   """Get an imdb (image database) by name."""

@@ -44,6 +44,12 @@ def parse_args():
   parser.add_argument('--net', dest='net',
                       help='vgg16, res50, res101, res152, mobile',
                       default='res50', type=str)
+
+  parser.add_argument('--eccv14', dest='eccv14',
+                      help='eccv14 eval',
+                      default=0, type=int)
+
+
   parser.add_argument('--set', dest='set_cfgs',
                         help='set config keys', default=None,
                         nargs=argparse.REMAINDER)
@@ -117,6 +123,6 @@ if __name__ == '__main__':
     sess.run(tf.global_variables_initializer())
     print('Loaded.')
 
-  test_net(sess, net, imdb, filename, max_per_image=args.max_per_image)
+  test_net(sess, net, imdb, filename, max_per_image=args.max_per_image, eccv14=args.eccv14)
 
   sess.close()
