@@ -127,6 +127,13 @@ for split in ['train', 'val', 'test']:
   name = 'grocery11_{}'.format(split)
   __sets[name] = (lambda split=split,path=datapath: grocery(split, path, db='11'))
 
+# Set own dataset
+datapath = os.path.dirname(os.path.abspath(__file__))+'/../../data/grocery_full2'
+
+for split in ['train', 'val', 'test']:
+  name = 'grocery_full2_{}'.format(split)
+  __sets[name] = (lambda split=split,path=datapath: grocery_full(split, path, db='2'))
+
 
 def get_imdb(name):
   """Get an imdb (image database) by name."""

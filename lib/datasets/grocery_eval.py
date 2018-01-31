@@ -10,6 +10,7 @@ import pickle
 import numpy as np
 import cv2
 
+from model.nms_wrapper import nms
 def parse_rec(filename):
     """ Parse a INRIA-Person annotation file """
     objects = []
@@ -73,8 +74,8 @@ def grocery_ap(rec, prec, use_07_metric=False):
         mpre = np.concatenate(([0.], prec, [0.]))
 
         # compute the precision envelope
-        for i in range(mpre.size - 1, 0, -1):
-            mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
+      #  for i in range(mpre.size - 1, 0, -1):
+      #      mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
 
         # to calculate area under PR curve, look for points
         # where X axis (recall) changes value
@@ -127,7 +128,7 @@ def grocery_eval(detpath,
         # load annots
         recs = {}
         for i, imagename in enumerate(imagenames):
-            recs[imagename] = parse_rec(annopath.format(imagename))
+            recs[imagename] = parse_rec_all(annopath.format(imagename))
             if i % 100 == 0:
                 print ('Reading annotation for {:d}/{:d}'.format(
                     i + 1, len(imagenames)))
@@ -217,7 +218,7 @@ def grocery_eval(detpath,
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
     rec = tp / float(npos)
-    print(npos)
+    #print(npos)
     # avoid divide by zero in case the first detection matches a difficult
     # ground truth
     prec = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
@@ -314,16 +315,39 @@ def grocery_eval_eccv_14(detpath,
 
     confidence = np.array([float(x[1]) for x in splitlines])
     BB = np.array([[float(z) for z in x[2:]] for x in splitlines])
-   
-    print(R['gt'])
 
+#    dets = np.hstack((BB,confidence[:,np.newaxis])).astype(np.float32, copy=False)
+#    keep = nms(dets,0.2)
+   
+#    confidence = confidence[keep]
+#    BB = BB[keep,:]
+#    ids = ids[keep]
+   
+    #print(R['gt'])
+    
+    keep = 8
     # sort by confidence
-    sorted_ind = np.argsort(-confidence)
-    sorted_scores = np.sort(-confidence)
+    sorted_ind = np.argsort(-confidence)[:keep]
+    sorted_scores = np.sort(-confidence)[:keep]
     BB = BB[sorted_ind, :]
     ids = ids[sorted_ind]
 
-    print(ids)	
+#    print(sorted_scores)
+    uni_id = []
+    ''' 
+    keep = np.where(sorted_scores<-0.1)
+    if len(keep[0]) > 0:
+        print(keep)
+        maj = ids[keep[0]]
+        top = min(len(maj),5)
+        maj = maj[:top]
+        uni_id,uni_count = np.unique(maj, return_counts=True)
+        sorted_count = np.argsort(-uni_count)[0]
+        uni_id = uni_id[sorted_count]
+        print(uni_id)
+    print(len(uni_id))
+#    print(ids)
+    '''           	
     # go down dets and mark TPs and FPs
     nd = len(ids)
     print('No. of detections:{}'.format(nd))
@@ -331,19 +355,19 @@ def grocery_eval_eccv_14(detpath,
     fp = np.zeros(nd)
 
     area = 0
-    for gt in R['bbox'].astype(float):
-        area += (gt[2] - gt[0] + 1.) * (gt[3] - gt[1] + 1.)
+#    for gt in R['bbox'].astype(float):
+#        area += (gt[2] - gt[0] + 1.) * (gt[3] - gt[1] + 1.)
     #print(cachedir+'../data/Images/'+classname+'.jpg')
-    imshape = cv2.imread(cachedir+'/../data/Images/'+classname+'.jpg').shape
+#    imshape = cv2.imread(cachedir+'/../data/Images/'+classname+'.jpg').shape
     #print(area)
     #print(imshape[0]*imshape[1]*0.4)
-    valid=False
-    if area >= imshape[0]*imshape[1]*0.4:
-        valid=True 
+#    valid=False
+#    if area >= imshape[0]*imshape[1]*0.4:
+#        valid=True 
         #print('yes')
-    else:
-        print('lesser boxes')
-
+#    else:
+#        print('lesser boxes')
+        
     for d in range(nd):
         bb = BB[d, :].astype(float)
         ovmax = -np.inf
@@ -382,8 +406,14 @@ def grocery_eval_eccv_14(detpath,
 
    
         if ovmax > ovthresh:
-            if R['gt'][jmax] == ids[d]:
-                if not R['difficult'][jmax]:
+#        if inside_gt :
+            if len(uni_id) > 0:
+               test_id = uni_id
+#               print('Test id:{}'.format(test_id))
+            else:
+               test_id = ids[d]
+            if R['gt'][jmax] == test_id: 
+               if not R['difficult'][jmax]:
                     if not R['det'][jmax]:
                         tp[d] = 1.
                         R['det'][jmax] = 1
@@ -391,17 +421,33 @@ def grocery_eval_eccv_14(detpath,
                         fp[d] = 1.
             else:
                 fp[d] = 1.
+                
         else:
-            if valid and not inside_gt:
-                fp[d] = 1.
-            else:
-                fp[d] = 0.
+            fp[d]=1.		
+           # if valid and not inside_gt:
+           #     fp[d] = 1.
+           # else:
+           #     fp[d] = 0.
 
+    ''' 
+    
+    uni_id = np.unique(uni_id[0])
+    fp = np.zeros(len(uni_id))
+    tp = np.zeros(len(uni_id))
+    for ind,uid in enumerate(uni_id):
+        if uid in R['gt']:
+            tp[ind] = 1.
+        else:
+            fp[ind] = 1.
+    tp = np.sort(tp)[::-1]
+    fp = np.sort(fp)
+    '''
     # compute precision recall
     fp = np.cumsum(fp)
     tp = np.cumsum(tp)
     
-#    print(tp)
+    print(tp)
+#    print(tp[-1]/len(tp))
 #    print(fp)
     
     rec = tp / float(npos)
@@ -413,5 +459,5 @@ def grocery_eval_eccv_14(detpath,
 #    print(prec)
 #    print(rec)
     ap = np.mean(total)
-
+#    ap = tp[-1]/len(tp)
     return rec, prec, ap

@@ -253,9 +253,9 @@ class Network(object):
       rpn_select = tf.where(tf.not_equal(rpn_label, -1))
       rpn_cls_score = tf.reshape(tf.gather(rpn_cls_score, rpn_select), [-1, 2])
       rpn_label = tf.reshape(tf.gather(rpn_label, rpn_select), [-1])
-      rpn_cross_entropy = tf.reduce_mean(
-      tf.nn.sparse_softmax_cross_entropy_with_logits(logits=rpn_cls_score, labels=rpn_label))
-      #rpn_cross_entropy = self.focal_loss(rpn_cls_score,rpn_label)
+      #rpn_cross_entropy = tf.reduce_mean(
+      #tf.nn.sparse_softmax_cross_entropy_with_logits(logits=rpn_cls_score, labels=rpn_label))
+      rpn_cross_entropy = self.focal_loss(rpn_cls_score,rpn_label)
 
       # RPN, bbox loss
       rpn_bbox_pred = self._predictions['rpn_bbox_pred']
@@ -268,8 +268,8 @@ class Network(object):
       # RCNN, class loss
       cls_score = self._predictions["cls_score"]
       label = tf.reshape(self._proposal_targets["labels"], [-1])
-      cross_entropy = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=cls_score, labels=label))
-      #cross_entropy = self.focal_loss(cls_score,label)
+      #cross_entropy = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=cls_score, labels=label))
+      cross_entropy = self.focal_loss(cls_score,label)
 
       # RCNN, bbox loss
       bbox_pred = self._predictions['bbox_pred']

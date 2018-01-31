@@ -27,7 +27,7 @@ class grocery_full(imdb):
         self._comp_id = 'comp4'
         self._salt = 'salt'
         # Specific config options
-        self.config = {'cleanup'  : True,
+        self.config = {'cleanup'  : False,
                        'use_salt' : True,
                        'top_k'    : 2000,
                        'use_diff' : False,
@@ -285,7 +285,7 @@ class grocery_full(imdb):
                     filename = self._get_grocery_results_file_template().format(cls)
                     os.remove(filename)
         else:
-            self._write_grocery_results_file_per_image(all_boxes)
+        #    self._write_grocery_results_file_per_image(all_boxes)
             self._do_python_eval(output_dir,eccv14)
             if self.config['cleanup']:
                 for cls in self.image_index:
@@ -334,7 +334,7 @@ class grocery_full(imdb):
             cat = self.classes
         else:
             cat = self.image_index
-
+       
         for i, cls in enumerate(cat):
             if cls == '__background__':
                 continue

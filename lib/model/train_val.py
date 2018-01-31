@@ -133,7 +133,7 @@ class SolverWrapper(object):
      # print("lr at init:{}".format(lr.eval()))
       var_train = []
       for var in tf.trainable_variables():
-        if any(prefix in var.name for prefix in ['block4/unit_2/','block4/unit_3/','rpn','cls','bbox']):
+        if any(prefix in var.name for prefix in ['block3/unit_22/','block3/unit_23/','block4','rpn','cls','bbox']):
       #  if any(prefix in var.name for prefix in ['rpn','cls','bbox']): 
           var_train.append(var)
           print("gradient only for var:{}".format(var.name))
@@ -195,25 +195,27 @@ class SolverWrapper(object):
     # Initialize all variables first
     sess.run(tf.variables_initializer(variables, name='init'))
     var_keep_dic = self.get_variables_in_checkpoint_file(self.pretrained_model)
+    print(type(var_keep_dic))
     # Get the variables to restore, ignoring the variables to fix
     variables_to_restore = self.net.get_variables_to_restore(variables, var_keep_dic)
 
 
-    variables_to_restore = variables_to_restore[:-4] #don't restore last layers
-    vv = []
-    for v in variables_to_restore:
-      if not any(prefix in v.name for prefix in ['/cls','/bbox']):   
-          vv.append(v)
+#    variables_to_restore = variables_to_restore[:-4] #don't restore last layers
 
-    # restorer = tf.train.Saver(variables_to_restore)
-    restorer = tf.train.Saver(vv)
+#    vv = []
+#    for v in variables_to_restore:
+#      if not any(prefix in v.name for prefix in ['/cls','/bbox']):   
+#          vv.append(v)
+
+    restorer = tf.train.Saver(variables_to_restore)
+#    restorer = tf.train.Saver(vv)
     restorer.restore(sess, self.pretrained_model)
     print('Loaded.')
     # Need to fix the variables before loading, so that the RGB weights are changed to BGR
     # For VGG16 it also changes the convolutional weights fc6 and fc7 to
     # fully connected weights
-    #self.net.fix_variables(sess, self.pretrained_model)
-    #print('Fixed.')
+    self.net.fix_variables(sess, self.pretrained_model)
+    print('Fixed.')
     last_snapshot_iter = 0
     rate = cfg.TRAIN.LEARNING_RATE
     stepsizes = list(cfg.TRAIN.STEPSIZE)
