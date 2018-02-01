@@ -119,7 +119,7 @@ class Network(object):
 
       channels = tf.constant(3.)
       smcrop_shape = tf.shape(smcrop)
-
+      print(smcrop_shape)
       size = tf.to_int32(smcrop_shape[1] * smcrop_shape[2])
 
       smcrop = tf.reshape(smcrop, [-1, size, tf.to_int32(smcrop.shape[3])])
@@ -502,7 +502,7 @@ class Network(object):
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._smcrop,
+                                                                        self._box_diversity['distance'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     print(dd.shape)
