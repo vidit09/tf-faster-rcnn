@@ -115,7 +115,7 @@ class Network(object):
     with tf.variable_scope(name) as scope:
       overlaps = tf.py_func(proposal_small_boxes,
                              [rois,self._gt_smboxes],
-                             [tf.int32],name="proposalsm")
+                             [tf.int64],name="proposalsm")
 
       channels = tf.constant(3.)
       smcrop_shape = tf.shape(smcrop)
