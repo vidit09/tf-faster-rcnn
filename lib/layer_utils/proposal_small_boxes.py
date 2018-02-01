@@ -42,7 +42,7 @@ def proposal_small_boxes(rois, gt_smboxes):
         overlap[i].extend([[0,0]]*pad)
 
     overlap = np.array(overlap)
-
+    return overlap
 
 
 
