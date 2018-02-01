@@ -230,7 +230,27 @@ class grocery_full(imdb):
 
         overlaps = scipy.sparse.csr_matrix(overlaps)
 
+        data = []
+        filename = os.path.join(self._data_path, 'AnnotationsSmall', index + '.txt')
+        # print 'Loading: {}'.format(filename)
+        with open(filename) as f:
+            data = f.read()
+        smboxes = []
+        if len(data)>0:
+            objs = re.findall('\d+ \d+ \d+ \d+ \d+', data)
+            smboxes = np.zeros((len(objs), 4), dtype=np.uint16)
+            for ix, obj in enumerate(objs):
+                # Make pixel indexes 0-based
+                coor = re.findall('\d+', obj)
+                x1 = float(coor[0])
+                y1 = float(coor[1])
+                x2 = float(coor[2])
+                y2 = float(coor[3])
+
+                smboxes[ix, :] = [x1, y1, x2, y2]
+
         return {'boxes' : boxes,
+                'smboxes': smboxes,
                 'gt_classes': gt_classes,
                 'gt_overlaps' : overlaps,
                 'flipped' : False}

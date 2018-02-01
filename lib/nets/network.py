@@ -37,6 +37,8 @@ class Network(object):
     self._train_summaries = []
     self._event_summaries = {}
     self._variables_to_fix = {}
+    self._box_diversity = {}
+    self._smcrop = None
 
   def _add_gt_image(self):
     # add back mean
@@ -107,6 +109,30 @@ class Network(object):
       rpn_scores.set_shape([None, 1])
 
     return rois, rpn_scores
+
+  def _box_diversity_fn(self, rois, smcrop, name):
+    with tf.variable_scope(name) as scope:
+      overlaps = tf.py_func(proposal_small_boxes,
+                             [rois,self._gt_smboxes],
+                             [tf.int32],name="proposalsm")
+
+      channels = tf.constant(3.)
+      smcrop_shape = tf.shape(smcrop)
+
+      size = tf.to_float(smcrop_shape[1] * smcrop_shape[2])
+
+      smcrop = tf.reshape(smcrop, [-1, smcrop_shape[1] * smcrop_shape[2], smcrop.shape[3]])
+      gram_matrices = tf.matmul(tf.transpose(smcrop, perm=[0, 2, 1]), smcrop)
+      gram_matrices = tf.reshape(gram_matrices, [-1, tf.shape(gram_matrices)[1] * tf.shape(gram_matrices)[2]])
+
+      #D = r - 2 A A' + r' r=A.A
+      r = tf.reduce_sum(gram_matrices * gram_matrices, 1)
+      r = tf.reshape(r, [-1, 1])
+      D = r - 2 * tf.matmul(gram_matrices, tf.transpose(gram_matrices)) + tf.transpose(r)
+
+      self._box_diversity['distance'] = D
+      self._box_diversity['overlaps'] = overlaps
+
 
   # Only use it if you have roi_pooling op written in tf.image
   def _roi_pool_layer(self, bootom, rois, name):
@@ -217,6 +243,8 @@ class Network(object):
       # region of interest pooling
       if cfg.POOLING_MODE == 'crop':
         pool5 = self._crop_pool_layer(net_conv, rois, "pool5")
+        self.smcrop = self._crop_pool_layer(net_conv,self._gt_smboxes,"smcrop")
+        self._box_diversity_fn(rois,self.smcrop,"box_diversity_fn")
       else:
         raise NotImplementedError
 
@@ -278,12 +306,21 @@ class Network(object):
       bbox_outside_weights = self._proposal_targets['bbox_outside_weights']
       loss_box = self._smooth_l1_loss(bbox_pred, bbox_targets, bbox_inside_weights, bbox_outside_weights)
 
+
+
+      diversity = self._box_diversity['distance']
+      overlap = self._box_diversity['overlaps']
+
+      diversity_loss = tf.gather_nd(diversity,overlap)
+      diversity_loss = tf.reduce_mean(tf.reduce_sum(diversity_loss,axis=1))
+      
       self._losses['cross_entropy'] = cross_entropy
       self._losses['loss_box'] = loss_box
       self._losses['rpn_cross_entropy'] = rpn_cross_entropy
       self._losses['rpn_loss_box'] = rpn_loss_box
+      self._losses['diversity_loss'] = diversity_loss
 
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
       self._losses['total_loss'] = loss
 
       self._event_summaries.update(self._losses)
@@ -358,6 +395,7 @@ class Network(object):
     self._image = tf.placeholder(tf.float32, shape=[1, None, None, 3])
     self._im_info = tf.placeholder(tf.float32, shape=[3])
     self._gt_boxes = tf.placeholder(tf.float32, shape=[None, 5])
+    self._gt_smboxes = tf.placeholder(tf.float32, shape=[None, 5])
     self._tag = tag
 
     self._num_classes = num_classes
@@ -450,7 +488,7 @@ class Network(object):
 
   def get_summary(self, sess, blobs):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
-                 self._gt_boxes: blobs['gt_boxes']}
+                 self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
     summary = sess.run(self._summary_op_val, feed_dict=feed_dict)
 
     return summary
@@ -469,7 +507,7 @@ class Network(object):
 
   def train_step_with_summary(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
-                 self._gt_boxes: blobs['gt_boxes']}
+                 self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
     rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, summary, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                                  self._losses['rpn_loss_box'],
                                                                                  self._losses['cross_entropy'],
@@ -482,7 +520,7 @@ class Network(object):
 
   def train_step_no_return(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
-                 self._gt_boxes: blobs['gt_boxes']}
+                 self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
     sess.run([train_op], feed_dict=feed_dict)
 
   def focal_loss(prediction_tensor, target_tensor, weights=None, alpha=0.25, gamma=2):

@@ -49,6 +49,15 @@ def get_minibatch(roidb, num_classes):
     [im_blob.shape[1], im_blob.shape[2], im_scales[0]],
     dtype=np.float32)
 
+  smboxes = roidb[0]['smboxes']
+  gt_smboxes = np.empty((len(smboxes), 5), dtype=np.float32)
+
+  if len(smboxes) > 0:
+    gt_smboxes[:,0] = 0
+    gt_smboxes[:,1:] = smboxes * im_scales[0]
+
+  blobs['gt_smboxes'] = gt_smboxes
+
   return blobs
 
 def _get_image_blob(roidb, scale_inds):
