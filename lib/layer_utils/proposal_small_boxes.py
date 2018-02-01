@@ -7,7 +7,7 @@ import numpy as np
 import numpy.random as npr
 from model.config import cfg
 from model.bbox_transform import bbox_transform
-from utils.cython_bbox import bbox_intersect
+from utils.cython_bbox_intersect import bbox_intersect
 
 
 def proposal_small_boxes(rois, gt_smboxes):
