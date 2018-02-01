@@ -131,7 +131,7 @@ class Network(object):
       r = tf.reshape(r, [-1, 1])
       D = r - 2 * tf.matmul(gram_matrices, tf.transpose(gram_matrices)) + tf.transpose(r)
 
-      self._box_diversity['distance'] = D / (4. * (channels ** 2) * (size ** 2))
+      self._box_diversity['distance'] = D / (4. * (channels ** 2) * (tf.to_float(size) ** 2))
       self._box_diversity['overlaps'] = overlaps
 
 
