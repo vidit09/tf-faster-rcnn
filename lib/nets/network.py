@@ -502,7 +502,7 @@ class Network(object):
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._box_diversity['distance'],
+                                                                        self._smcrop,
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     print(dd.shape)
