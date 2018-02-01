@@ -126,6 +126,8 @@ class Network(object):
       gram_matrices = tf.matmul(tf.transpose(smcrop, perm=[0, 2, 1]), smcrop)
       gram_matrices = tf.reshape(gram_matrices, [-1, tf.shape(gram_matrices)[1] * tf.shape(gram_matrices)[2]])
 
+      self._box_diversity['gramshape'] = tf.shape(gram_matrices)
+
       #D = r - 2 A A' + r' r=A.A
       r = tf.reduce_sum(gram_matrices * gram_matrices, 1)
       r = tf.reshape(r, [-1, 1])
@@ -497,15 +499,17 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss,dd, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss,dd,ss, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
                                                                         self._box_diversity['smshape'],
+                                                                        self._box_diversity['gramshape'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     print(dd)
+    print(ss)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
