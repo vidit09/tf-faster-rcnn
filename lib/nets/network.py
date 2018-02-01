@@ -117,9 +117,10 @@ class Network(object):
                              [rois,self._gt_smboxes],
                              [tf.int64],name="proposalsm")
 
-      channels = tf.constant(3.)
+
       smcrop_shape = tf.shape(smcrop)
       self._box_diversity['smshape'] = smcrop_shape
+      channels = tf.to_float(smcrop.shape[3])
       size = tf.to_int32(smcrop_shape[1] * smcrop_shape[2])
 
       smcrop = tf.reshape(smcrop, [-1, size, tf.to_int32(smcrop.shape[3])])
@@ -508,8 +509,8 @@ class Network(object):
                                                                         self._box_diversity['gramshape'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
-    print(dd)
-    print(ss)
+    # print(dd)
+    # print(ss)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
