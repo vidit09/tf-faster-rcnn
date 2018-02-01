@@ -500,17 +500,16 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss,dd,ss, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss,dvloss, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._box_diversity['smshape'],
-                                                                        self._box_diversity['gramshape'],
+                                                                        self._losses['diversity_loss'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     # print(dd)
-    # print(ss)
+    print(dvloss)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
