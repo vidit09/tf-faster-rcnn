@@ -20,6 +20,7 @@ from layer_utils.proposal_layer import proposal_layer
 from layer_utils.proposal_top_layer import proposal_top_layer
 from layer_utils.anchor_target_layer import anchor_target_layer
 from layer_utils.proposal_target_layer import proposal_target_layer
+from layer_utils.proposal_small_boxes import proposal_small_boxes
 from utils.visualization import draw_bounding_boxes
 
 from model.config import cfg
@@ -313,7 +314,7 @@ class Network(object):
 
       diversity_loss = tf.gather_nd(diversity,overlap)
       diversity_loss = tf.reduce_mean(tf.reduce_sum(diversity_loss,axis=1))
-      
+
       self._losses['cross_entropy'] = cross_entropy
       self._losses['loss_box'] = loss_box
       self._losses['rpn_cross_entropy'] = rpn_cross_entropy
