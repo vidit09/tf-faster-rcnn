@@ -120,9 +120,9 @@ class Network(object):
       channels = tf.constant(3.)
       smcrop_shape = tf.shape(smcrop)
 
-      size = tf.to_float(smcrop_shape[1] * smcrop_shape[2])
+      size = tf.to_int32(smcrop_shape[1] * smcrop_shape[2])
 
-      smcrop = tf.reshape(smcrop, [-1, smcrop_shape[1] * smcrop_shape[2], smcrop.shape[3]])
+      smcrop = tf.reshape(smcrop, [-1, size, tf.to_int32(smcrop.shape[3])])
       gram_matrices = tf.matmul(tf.transpose(smcrop, perm=[0, 2, 1]), smcrop)
       gram_matrices = tf.reshape(gram_matrices, [-1, tf.shape(gram_matrices)[1] * tf.shape(gram_matrices)[2]])
 
