@@ -43,6 +43,6 @@ def bbox_intersect(
                         (boxes[n, 2] - boxes[n, 0] + 1) *
                         (boxes[n, 3] - boxes[n, 1] + 1)
                     )
-                    overlaps[n, k] = iw * ih / ua
+                    overlaps[n, k] = iw * ih / box_area
     return overlaps
 
