@@ -51,7 +51,9 @@ CLASSES_FULL = ('__background__',
 NETS = {'res101': ('res101_faster_rcnn_iter_{}.ckpt',)}
 DATASETS= {'pascal_voc': ('voc_2007_trainval',),'pascal_voc_0712': ('voc_2007_trainval+voc_2012_trainval',),
            'grocery':('grocery_train',),'grocery2':('grocery2_train',),'grocery3':('grocery3_train',), 'grocery4':('grocery4_train',),
-'grocery5':('grocery5_train',), 'grocery6':('grocery6_train',),'grocery7':('grocery7_train',),'grocery8':('grocery8_train',),'grocery9':('grocery9_train',),'grocery10':('grocery10_train',),'grocery_full':('grocery_full_train',),'grocery_full2':('grocery_full2_train',)}
+'grocery5':('grocery5_train',), 'grocery6':('grocery6_train',),'grocery7':('grocery7_train',),'grocery8':('grocery8_train',),
+           'grocery9':('grocery9_train',),'grocery10':('grocery10_train',),'grocery_full':('grocery_full_train',),
+           'grocery_full2':('grocery_full2_train',),'grocery_full3':('grocery_full3_train',)}
 
 def vis_detections(im, class_name, dets,im_path, thresh=0.5):
     """Draw detected bounding boxes."""
