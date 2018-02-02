@@ -505,11 +505,11 @@ class Network(object):
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._box_diversity['overlapshape'],
+                                                                        self._losses['diversity_loss'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     # print(dd)
-    print(dvloss)
+    # print(dvloss)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
