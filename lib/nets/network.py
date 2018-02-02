@@ -119,7 +119,7 @@ class Network(object):
 
 
       smcrop_shape = tf.shape(smcrop)
-      self._box_diversity['smshape'] = smcrop_shape
+      self._box_diversity['overlapshape'] = tf.shape(overlaps)
       channels = tf.to_float(smcrop.shape[3])
       size = tf.to_int32(smcrop_shape[1] * smcrop_shape[2])
 
@@ -505,11 +505,11 @@ class Network(object):
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._losses['diversity_loss'],
+                                                                        self._losses['overlapshape'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     # print(dd)
-    # print(dvloss)
+    print(dvloss)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
