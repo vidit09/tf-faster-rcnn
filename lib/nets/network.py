@@ -505,7 +505,7 @@ class Network(object):
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._losses['overlapshape'],
+                                                                        self._box_diversity['overlapshape'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     # print(dd)
