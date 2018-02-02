@@ -22,6 +22,7 @@ def proposal_small_boxes(rois, gt_smboxes):
     max_length = 0
     for i in range(rois.shape[0]):
         ind = np.where(intersect[i,:] >= 0.8)[0]
+        print(ind)
         if len(ind) == 0:
             overlap.append([[0,0]])
             if max_length < 1:
