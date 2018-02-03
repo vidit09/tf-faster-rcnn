@@ -322,9 +322,10 @@ class Network(object):
       self._losses['loss_box'] = loss_box
       self._losses['rpn_cross_entropy'] = rpn_cross_entropy
       self._losses['rpn_loss_box'] = rpn_loss_box
-      self._losses['diversity_loss'] = diversity_loss
+      # self._losses['diversity_loss'] = diversity_loss
 
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
+      # loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
       self._losses['total_loss'] = loss
 
       self._event_summaries.update(self._losses)
@@ -500,12 +501,12 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss,dvloss, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        self._losses['diversity_loss'],
+                                                                        # self._losses['diversity_loss'],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
     # print(dd)
