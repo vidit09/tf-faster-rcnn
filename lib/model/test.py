@@ -148,7 +148,7 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thr
   output_dir = get_output_dir(imdb, weights_filename)
   # timers
   _t = {'im_detect' : Timer(), 'misc' : Timer()}
-
+  '''
   for i in range(num_images):
     im = cv2.imread(imdb.image_path_at(i))
 
@@ -190,7 +190,7 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thr
   det_file = os.path.join(output_dir, 'detections.pkl')
   with open(det_file, 'wb') as f:
     pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
-
+  '''
   print('Evaluating detections')
   imdb.evaluate_detections(all_boxes, output_dir, eccv14)
 

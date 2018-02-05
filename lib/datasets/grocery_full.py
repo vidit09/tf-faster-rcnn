@@ -305,7 +305,7 @@ class grocery_full(imdb):
                     filename = self._get_grocery_results_file_template().format(cls)
                     os.remove(filename)
         else:
-            self._write_grocery_results_file_per_image(all_boxes)
+        #    self._write_grocery_results_file_per_image(all_boxes)
             self._do_python_eval(output_dir,eccv14)
             if self.config['cleanup']:
                 for cls in self.image_index:
