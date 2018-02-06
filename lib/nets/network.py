@@ -314,18 +314,24 @@ class Network(object):
 
       diversity = self._box_diversity['distance']
       overlap = self._box_diversity['overlaps']
-
       diversity_loss = tf.gather_nd(diversity,overlap)
-      diversity_loss = tf.reduce_mean(tf.reduce_sum(diversity_loss,axis=1))
+      self._box_diversity['shapell'] = tf.shape(diversity_loss)
+      self._box_diversity['roi_loss'] = tf.reduce_sum(diversity_loss,axis=2)
+      all_roi = tf.reshape(self._proposal_targets["labels"], [-1])
+      pos_roi =  tf.where(tf.not_equal(all_roi, 0))
+      per_roi_loss = tf.reduce_sum(diversity_loss,axis=2)
+      pos_per_roi_loss = tf.gather(per_roi_loss,pos_roi)
+      diversity_loss = tf.reduce_mean(pos_per_roi_loss)
+#      diversity_loss = tf.reduce_mean(self._box_diversity['roi_loss'])
 
       self._losses['cross_entropy'] = cross_entropy
       self._losses['loss_box'] = loss_box
       self._losses['rpn_cross_entropy'] = rpn_cross_entropy
       self._losses['rpn_loss_box'] = rpn_loss_box
-      # self._losses['diversity_loss'] = diversity_loss
+      self._losses['diversity_loss'] = diversity_loss
 
-      # loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
+      #loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
       self._losses['total_loss'] = loss
 
       self._event_summaries.update(self._losses)
@@ -501,16 +507,21 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, dvloss, ov, sl,ovv,rl, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
-                                                                        # self._losses['diversity_loss'],
+                                                                        self._losses['diversity_loss'],
+                                                                        self._box_diversity['roi_loss'],
+                                                                        self._box_diversity['shapell'],
+                                                                        self._box_diversity['overlaps'],
+                                                                        self._proposal_targets["labels"],
                                                                         train_op],
                                                                        feed_dict=feed_dict)
-    # print(dd)
-    # print(dvloss)
+    print(rl.shape)
+    print(dvloss)
+    print(ovv)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
