@@ -255,7 +255,7 @@ class Network(object):
     fc7 = self._head_to_tail(pool5, is_training)
     with tf.variable_scope(self._scope, self._scope):
       # region classification
-      cls_prob, bbox_pred = self._region_classification(fc7, is_training, 
+      cls_prob, bbox_pred = self._region_classification(fc7, is_training,
                                                         initializer, initializer_bbox)
 
     self._score_summaries.update(self._predictions)
@@ -513,12 +513,12 @@ class Network(object):
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
                                                                         self._losses['diversity_loss'],
-                                                                        self._box_diversity['roi_loss'],
+                                                                        self._box_diversity['gramshape'],
                                                                         self._box_diversity['shapell'],
                                                                         self._box_diversity['overlaps'],
                                                                         self._proposal_targets["labels"],
                                                                         train_op],
-                                                                       feed_dict=feed_dict)
+    print(ov)                                                                   feed_dict=feed_dict)
     print(rl.shape)
     print(dvloss)
     print(ovv)
