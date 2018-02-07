@@ -322,7 +322,7 @@ class Network(object):
       self._box_diversity['pos_roi'] = pos_roi
       per_roi_loss = tf.reduce_sum(diversity_loss,axis=2)
       pos_per_roi_loss = per_roi_loss*tf.to_float(pos_roi)
-      diversity_loss = tf.reduce_mean(pos_per_roi_loss)
+      diversity_loss = tf.reduce_sum(pos_per_roi_loss)/tf.reduce_sum(tf.to_float(pos_roi))
       # diversity_loss = tf.reduce_mean(self._box_diversity['roi_loss'])
 
       self._losses['cross_entropy'] = cross_entropy
