@@ -187,6 +187,7 @@ if __name__ == '__main__':
     saver = tf.train.Saver()
     saver.restore(sess, tfmodel)
 
+    train_writer = tf.summary.FileWriter('./', tf.get_default_graph())
     print('Loaded network {:s}'.format(tfmodel))
 
     # im_names = ['7.jpg']
