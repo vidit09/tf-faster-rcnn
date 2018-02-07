@@ -518,7 +518,8 @@ class Network(object):
                                                                         self._box_diversity['overlaps'],
                                                                         self._proposal_targets["labels"],
                                                                         train_op],
-    print(ov)                                                                   feed_dict=feed_dict)
+                                                                      feed_dict=feed_dict)
+    print(ov)
     print(rl.shape)
     print(dvloss)
     print(ovv)
