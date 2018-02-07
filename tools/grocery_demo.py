@@ -122,7 +122,7 @@ def demo(sess, net, image_name, classes):
     print(scores.shape)
     print(len(classes))
     # Visualize detections for each class
-    CONF_THRESH = 0.5
+    CONF_THRESH = 0.1
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(classes[1:]):
         cls_ind += 1 # because we skipped background
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     saver = tf.train.Saver()
     saver.restore(sess, tfmodel)
 
-    train_writer = tf.summary.FileWriter('./', tf.get_default_graph())
+    train_writer = tf.summary.FileWriter('./', sess.graph)
     print('Loaded network {:s}'.format(tfmodel))
 
     # im_names = ['7.jpg']
