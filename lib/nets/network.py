@@ -317,12 +317,12 @@ class Network(object):
       diversity_loss = tf.gather_nd(diversity,overlap)
       self._box_diversity['shapell'] = tf.shape(diversity_loss)
       self._box_diversity['roi_loss'] = tf.reduce_sum(diversity_loss,axis=2)
-      all_roi = tf.reshape(self._proposal_targets["labels"], [-1])
-      pos_roi =  tf.where(tf.not_equal(all_roi, 0))
-      per_roi_loss = tf.reduce_sum(diversity_loss,axis=2)
-      pos_per_roi_loss = tf.gather(per_roi_loss,pos_roi)
-      diversity_loss = tf.reduce_mean(pos_per_roi_loss)
-#      diversity_loss = tf.reduce_mean(self._box_diversity['roi_loss'])
+      # all_roi = tf.reshape(self._proposal_targets["labels"], [-1])
+      # pos_roi =  tf.where(tf.not_equal(all_roi, 0))
+      # per_roi_loss = tf.reduce_sum(diversity_loss,axis=2)
+      # pos_per_roi_loss = tf.gather(per_roi_loss,pos_roi)
+      # diversity_loss = tf.reduce_mean(pos_per_roi_loss)
+      diversity_loss = tf.reduce_mean(self._box_diversity['roi_loss'])
 
       self._losses['cross_entropy'] = cross_entropy
       self._losses['loss_box'] = loss_box
