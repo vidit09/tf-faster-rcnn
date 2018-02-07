@@ -321,7 +321,7 @@ class Network(object):
       pos_roi = tf.where(tf.not_equal(all_roi, 0),tf.ones_like(all_roi),tf.zeros_like(all_roi))
       self._box_diversity['pos_roi'] = pos_roi
       per_roi_loss = tf.reduce_sum(diversity_loss,axis=2)
-      pos_per_roi_loss = per_roi_loss*pos_roi
+      pos_per_roi_loss = per_roi_loss*tf.to_float(pos_roi)
       diversity_loss = tf.reduce_mean(pos_per_roi_loss)
       # diversity_loss = tf.reduce_mean(self._box_diversity['roi_loss'])
 
