@@ -513,16 +513,16 @@ class Network(object):
                                                                         self._losses['loss_box'],
                                                                         self._losses['total_loss'],
                                                                         self._losses['diversity_loss'],
-                                                                        self._box_diversity['gramshape'],
+                                                                        self._box_diversity['overlapshape'],
                                                                         self._box_diversity['shapell'],
                                                                         self._box_diversity['overlaps'],
                                                                         self._proposal_targets["labels"],
                                                                         train_op],
                                                                       feed_dict=feed_dict)
     print(ov)
-    print(rl.shape)
+    print(sl)
     print(dvloss)
-    print(ovv)
+    # print(ovv)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
