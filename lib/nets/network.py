@@ -520,10 +520,10 @@ class Network(object):
                                                                         self._proposal_targets["labels"],
                                                                         train_op],
                                                                       feed_dict=feed_dict)
-    print(ov)
-    print(sl)
-    print(dvloss)
-    print(ovv)
+    # print(ov)
+    # print(sl)
+    # print(dvloss)
+    # print(ovv)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
