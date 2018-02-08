@@ -331,7 +331,8 @@ class Network(object):
       self._losses['rpn_loss_box'] = rpn_loss_box
       self._losses['diversity_loss'] = diversity_loss
 
-      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + diversity_loss
+
+      loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box + tf.scalar_mul(1.5,diversity_loss)
       #loss = cross_entropy + loss_box + rpn_cross_entropy + rpn_loss_box
       self._losses['total_loss'] = loss
 
