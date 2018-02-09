@@ -447,7 +447,8 @@ class Network(object):
     layers_to_output = {'rois': rois}
 
     for op in tf.get_default_graph().get_operations():
-      print(op.name)
+      if 'block2' in op.name:
+        print(op.name)
 
     for var in tf.trainable_variables():
       self._train_summaries.append(var)
