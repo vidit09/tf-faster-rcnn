@@ -53,13 +53,13 @@ class resnetv1(Network):
     self._scope = 'resnet_v1_%d' % num_layers
     self._decide_blocks()
 
-  def _crop_pool_layer(self, bottom, rois, name):
+  def _crop_pool_layer(self, bottom, rois, name,factor=1):
     with tf.variable_scope(name) as scope:
       batch_ids = tf.squeeze(tf.slice(rois, [0, 0], [-1, 1], name="batch_id"), [1])
       # Get the normalized coordinates of bboxes
       bottom_shape = tf.shape(bottom)
-      height = (tf.to_float(bottom_shape[1]) - 1.) * np.float32(self._feat_stride[0])
-      width = (tf.to_float(bottom_shape[2]) - 1.) * np.float32(self._feat_stride[0])
+      height = (tf.to_float(bottom_shape[1]) - 1.) * np.float32(self._feat_stride[0]/factor)
+      width = (tf.to_float(bottom_shape[2]) - 1.) * np.float32(self._feat_stride[0]/factor)
       x1 = tf.slice(rois, [0, 1], [-1, 1], name="x1") / width
       y1 = tf.slice(rois, [0, 2], [-1, 1], name="y1") / height
       x2 = tf.slice(rois, [0, 3], [-1, 1], name="x2") / width
