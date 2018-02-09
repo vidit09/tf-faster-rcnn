@@ -40,6 +40,7 @@ class Network(object):
     self._variables_to_fix = {}
     self._box_diversity = {}
     self._smcrop = None
+    self.ten = None
 
   def _add_gt_image(self):
     # add back mean
@@ -247,6 +248,7 @@ class Network(object):
       # region of interest pooling
       if cfg.POOLING_MODE == 'crop':
         pool5 = self._crop_pool_layer(net_conv, rois, "pool5")
+        self.ten = tf.get_default_graph().get_tensor_by_name('resnet_v1_101/block2/unit_8/bottleneck_v1/conv3:0')
         self.smcrop = self._crop_pool_layer(net_conv,self._gt_smboxes,"smcrop")
         self._box_diversity_fn(rois,self.smcrop,"box_diversity_fn")
       else:
@@ -509,7 +511,7 @@ class Network(object):
   def train_step(self, sess, blobs, train_op):
     feed_dict = {self._image: blobs['data'], self._im_info: blobs['im_info'],
                  self._gt_boxes: blobs['gt_boxes'], self._gt_smboxes: blobs['gt_smboxes']}
-    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, dvloss, ov, sl,ovv,rl, _ = sess.run([self._losses["rpn_cross_entropy"],
+    rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss, dvloss, ov, sl,ovv,rl,tn, _ = sess.run([self._losses["rpn_cross_entropy"],
                                                                         self._losses['rpn_loss_box'],
                                                                         self._losses['cross_entropy'],
                                                                         self._losses['loss_box'],
@@ -519,12 +521,14 @@ class Network(object):
                                                                         self._box_diversity['pos_roi'],
                                                                         self._box_diversity['distance'],
                                                                         self._proposal_targets["labels"],
+                                                                        self.ten,
                                                                         train_op],
                                                                       feed_dict=feed_dict)
     # print(ov)
     # print(sl)
     # print(dvloss)
     # print(ovv)
+    print(tn.shape)
     return rpn_loss_cls, rpn_loss_box, loss_cls, loss_box, loss
 
   def train_step_with_summary(self, sess, blobs, train_op):
