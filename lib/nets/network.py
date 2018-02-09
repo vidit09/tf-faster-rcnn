@@ -249,7 +249,7 @@ class Network(object):
       if cfg.POOLING_MODE == 'crop':
         pool5 = self._crop_pool_layer(net_conv, rois, "pool5")
 
-        self.ten = tf.get_default_graph().get_tensor_by_name('resnet_v1_101_2/block2/unit_4/bottleneck_v1/Relu:0')
+        self.ten = tf.get_default_graph().get_tensor_by_name('resnet_v1_101_2/block2/unit_3/bottleneck_v1/Relu:0')
         self.smcrop = self._crop_pool_layer(net_conv,self._gt_smboxes,"smcrop")
         self._box_diversity_fn(rois,self.smcrop,"box_diversity_fn")
       else:
