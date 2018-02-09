@@ -147,13 +147,13 @@ class Network(object):
                                   pooled_width=cfg.POOLING_SIZE,
                                   spatial_scale=1. / 16.)[0]
 
-  def _crop_pool_layer(self, bottom, rois, name):
+  def _crop_pool_layer(self, bottom, rois, name, factor=1):
     with tf.variable_scope(name) as scope:
       batch_ids = tf.squeeze(tf.slice(rois, [0, 0], [-1, 1], name="batch_id"), [1])
       # Get the normalized coordinates of bounding boxes
       bottom_shape = tf.shape(bottom)
-      height = (tf.to_float(bottom_shape[1]) - 1.) * np.float32(self._feat_stride[0])
-      width = (tf.to_float(bottom_shape[2]) - 1.) * np.float32(self._feat_stride[0])
+      height = (tf.to_float(bottom_shape[1]) - 1.) * np.float32(self._feat_stride[0]/factor)
+      width = (tf.to_float(bottom_shape[2]) - 1.) * np.float32(self._feat_stride[0]/factor)
       x1 = tf.slice(rois, [0, 1], [-1, 1], name="x1") / width
       y1 = tf.slice(rois, [0, 2], [-1, 1], name="y1") / height
       x2 = tf.slice(rois, [0, 3], [-1, 1], name="x2") / width
@@ -250,7 +250,7 @@ class Network(object):
         pool5 = self._crop_pool_layer(net_conv, rois, "pool5")
 
         self.ten = tf.get_default_graph().get_tensor_by_name('resnet_v1_101_2/block2/unit_3/bottleneck_v1/Relu:0')
-        self.smcrop = self._crop_pool_layer(net_conv,self._gt_smboxes,"smcrop")
+        self.smcrop = self._crop_pool_layer(self.ten,self._gt_smboxes,"smcrop",2)
         self._box_diversity_fn(rois,self.smcrop,"box_diversity_fn")
       else:
         raise NotImplementedError
