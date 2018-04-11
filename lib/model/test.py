@@ -135,7 +135,7 @@ def apply_nms(all_boxes, thresh):
       nms_boxes[cls_ind][im_ind] = dets[keep, :].copy()
   return nms_boxes
 
-def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thresh=0.05):
+def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thresh=0.00):
   np.random.seed(cfg.RNG_SEED)
   """Test a Fast R-CNN network on an image database."""
   num_images = len(imdb.image_index)
@@ -144,11 +144,10 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thr
   #  (x1, y1, x2, y2, score)
   all_boxes = [[[] for _ in range(num_images)]
          for _ in range(imdb.num_classes)]
-
   output_dir = get_output_dir(imdb, weights_filename)
+            
   # timers
   _t = {'im_detect' : Timer(), 'misc' : Timer()}
-
   for i in range(num_images):
     im = cv2.imread(imdb.image_path_at(i))
 
@@ -190,7 +189,7 @@ def test_net(sess, net, imdb, weights_filename, max_per_image=100, eccv14=0, thr
   det_file = os.path.join(output_dir, 'detections.pkl')
   with open(det_file, 'wb') as f:
     pickle.dump(all_boxes, f, pickle.HIGHEST_PROTOCOL)
-
+     
   print('Evaluating detections')
   imdb.evaluate_detections(all_boxes, output_dir, eccv14)
 

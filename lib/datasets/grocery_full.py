@@ -233,8 +233,12 @@ class grocery_full(imdb):
         data = []
         filename = os.path.join(self._data_path, 'AnnotationsSmall', index + '.txt')
         # print 'Loading: {}'.format(filename)
-        with open(filename) as f:
-            data = f.read()
+        try:
+            with open(filename) as f:
+                data = f.read()
+        except:
+            pass
+
         smboxes = []
         if len(data)>0:
             objs = re.findall('\d+ \d+ \d+ \d+ \d+', data)
@@ -305,7 +309,7 @@ class grocery_full(imdb):
                     filename = self._get_grocery_results_file_template().format(cls)
                     os.remove(filename)
         else:
-            self._write_grocery_results_file_per_image(all_boxes)
+           # self._write_grocery_results_file_per_image(all_boxes)
             self._do_python_eval(output_dir,eccv14)
             if self.config['cleanup']:
                 for cls in self.image_index:
@@ -346,7 +350,7 @@ class grocery_full(imdb):
             'ImageSets',
             self._image_set + '.txt')
         cachedir = os.path.join(self._devkit_path, 'annotations_cache')
-        aps = []
+       # aps = []
         if not os.path.isdir(output_dir):
             os.mkdir(output_dir)
 
@@ -354,31 +358,48 @@ class grocery_full(imdb):
             cat = self.classes
         else:
             cat = self.image_index
-       
-        for i, cls in enumerate(cat):
-            if cls == '__background__':
-                continue
-            filename = self._get_grocery_results_file_template().format(cls)
-            
-            if not eccv14:
-                rec, prec, ap = grocery_eval(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
-            else:
-                rec, prec, ap = grocery_eval_eccv_14(
-                    filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
+        finalaps = []
+        finalps = []
+        finalrs = []
+        for recall_val in range(5,75,5):
+            aps = []
+            ps = []
+            rs = []
+            for i, cls in enumerate(cat):
+                if cls == '__background__':
+                    continue
+                filename = self._get_grocery_results_file_template().format(cls)
 
-            aps += [ap]
-            print('AP for {} = {:.4f}'.format(cls, ap))
-            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
-                diction = {'rec': rec, 'prec': prec, 'ap': ap}
-                pickle.dump(diction, f)
+                if not eccv14:
+                    rec, prec, ap = grocery_eval(
+                        filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5)
+                else:
+                    rec, prec, ap = grocery_eval_eccv_14(
+                        filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5, keep=recall_val)
 
-        print('Mean AP = {:.4f}'.format(np.mean(aps)))
-        print('~~~~~~~~')
-        print('Results:')
-        for ap in aps:
-            print('{:.3f}'.format(ap))
-        print('{:.3f}'.format(np.mean(aps)))
+                aps += [ap]
+                ps += [prec[-1]]
+                rs += [rec[-1]]
+
+                #print('AP for {} = {:.4f}'.format(cls, ap))
+                with open(os.path.join(output_dir, cls + '_pr.pkl'), 'wb') as f:
+                    diction = {'rec': rec, 'prec': prec, 'ap': ap}
+                    pickle.dump(diction, f)
+
+           # print('Mean AP = {:.4f}'.format(np.mean(aps)))
+           # print('~~~~~~~~')
+           # print('Results:')
+           # for ap in aps:
+           #     print('{:.3f}'.format(ap))
+            print('{:.3f}'.format(np.mean(aps)))
+            finalaps.append(np.mean(aps))
+            finalps.append(np.mean(ps))
+            finalrs.append(np.mean(rs))
+
+        print('final aps:{}'.format(np.mean(finalaps)))   
+        print('final ps:{}'.format(np.mean(finalps)))
+        print('final rs:{}'.format(np.mean(finalrs)))
+
         print('~~~~~~~~')
         print('')
         print('--------------------------------------------------------------')

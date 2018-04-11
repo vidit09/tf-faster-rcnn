@@ -48,7 +48,7 @@ CLASSES_FULL = ('__background__',
 
 
 
-NETS = {'res101': ('res101_faster_rcnn_iter_{}.ckpt',)}
+NETS = {'res101': ('res101_faster_rcnn_iter_{}.ckpt',),'res50':('res50_faster_rcnn_iter_{}.ckpt',)}
 DATASETS= {'pascal_voc': ('voc_2007_trainval',),'pascal_voc_0712': ('voc_2007_trainval+voc_2012_trainval',),
            'grocery':('grocery_train',),'grocery2':('grocery2_train',),'grocery3':('grocery3_train',), 'grocery4':('grocery4_train',),
 'grocery5':('grocery5_train',), 'grocery6':('grocery6_train',),'grocery7':('grocery7_train',),'grocery8':('grocery8_train',),
@@ -79,7 +79,7 @@ def vis_detections(im, class_name, dets,im_path, thresh=0.5):
         # bbox_pts = np.array([[x, y] for x in [bbox[0], bbox[2]] for y in [bbox[1], bbox[3]]])
         # cv2.fillPoly(im,bbox_pts,(0,255,0))
         cv2.rectangle(im,(bbox[0],bbox[1]),(bbox[2],bbox[3]),(0,0,0),3)
-        cv2.putText(im,'{}'.format(class_name),(int(bbox[0]),int(bbox[1]+50)),cv2.FONT_HERSHEY_SIMPLEX, 1,(255,0,0),2,cv2.LINE_AA)
+        cv2.putText(im,'{}:{:.2f}'.format(class_name,round(score,2)),(int(bbox[0]),int(bbox[1]+50)),cv2.FONT_HERSHEY_SIMPLEX, 2,(255,0,0),2,cv2.LINE_AA)
     #     ax.add_patch(
     #         plt.Rectangle((bbox[0], bbox[1]),
     #                       bbox[2] - bbox[0],
@@ -122,7 +122,7 @@ def demo(sess, net, image_name, classes):
     print(scores.shape)
     print(len(classes))
     # Visualize detections for each class
-    CONF_THRESH = 0.1
+    CONF_THRESH = 0.4
     NMS_THRESH = 0.3
     for cls_ind, cls in enumerate(classes[1:]):
         cls_ind += 1 # because we skipped background
@@ -180,6 +180,8 @@ if __name__ == '__main__':
         net = vgg16()
     elif demonet == 'res101':
         net = resnetv1(num_layers=101)
+    elif demonet == 'res50':
+        net = resnetv1(num_layers=50)
     else:
         raise NotImplementedError
     net.create_architecture("TEST", len(classes),

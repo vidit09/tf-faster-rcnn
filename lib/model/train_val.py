@@ -133,8 +133,7 @@ class SolverWrapper(object):
      # print("lr at init:{}".format(lr.eval()))
       var_train = []
       for var in tf.trainable_variables():
-        if any(prefix in var.name for prefix in ['block3/unit_22/','block3/unit_23/','block4','rpn','cls','bbox']):
-      #  if any(prefix in var.name for prefix in ['rpn','cls','bbox']): 
+        if any(prefix in var.name for prefix in ['block3/unit_22','block3/unit_23','block4','rpn','cls','bbox']):  
           var_train.append(var)
           print("gradient only for var:{}".format(var.name))
       # Compute the gradients with regard to the loss

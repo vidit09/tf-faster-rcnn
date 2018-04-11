@@ -349,12 +349,12 @@ def grocery_eval_eccv_14(detpath,
     print(len(uni_id))
 #    print(ids)
     '''           	
-    npos = len(list(set(R['gt'])))
-    nids = []
-    for ii in ids:
-        if ii not in nids:
-             nids.append(ii)
-    ids = nids
+   # npos = len(list(set(R['gt'])))
+   # nids = []
+   # for ii in ids:
+   #     if ii not in nids:
+   #          nids.append(ii)
+   # ids = nids
     # go down dets and mark TPs and FPs
     nd = len(ids)
     print('No. of detections:{}'.format(nd))
@@ -408,13 +408,13 @@ def grocery_eval_eccv_14(detpath,
 #            print(overlaps)	
 #        print(ovmax)
 #        print(jmax)
-        
+        ''' 
         if ids[d] in R['gt']:
             tp[d] = 1
         else:
             fp[d] = 1
-
-        '''            
+        '''
+                  
         if ovmax > ovthresh:
 #        if inside_gt :
             if len(uni_id) > 0:
@@ -438,7 +438,7 @@ def grocery_eval_eccv_14(detpath,
            #     fp[d] = 1.
            # else:
            #     fp[d] = 0.
-        '''    
+            
     ''' 
     
     uni_id = np.unique(uni_id[0])
